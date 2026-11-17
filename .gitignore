@@ -1,0 +1,26 @@
+# Third-party reference checkouts (re-create with scripts/fetch-references.sh)
+reference/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+
+# Node
+node_modules/
+
+# OS / editors
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Generated output from local runs
+out/
+*.tmp.drawio
