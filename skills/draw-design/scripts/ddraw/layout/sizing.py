@@ -17,13 +17,25 @@ TREATMENT_BY_ROLE = {
     "start": "backend",
     "end": "backend",
     "decision": "backend",
+    "state": "backend",
+    "initial": "backend",
+    "final": "backend",
+    "layer": "backend",
     "store": "store",
     "external": "external",
     "input": "input",
     "optional": "optional",
     "security": "security",
 }
-SHAPE_BY_ROLE = {"start": "pill", "end": "pill", "decision": "rhombus"}
+SHAPE_BY_ROLE = {
+    "start": "pill",
+    "end": "pill",
+    "decision": "rhombus",
+    "initial": "dot",
+    "final": "ring",
+    "state": "state",
+}
+MARKERS = {"dot": 24, "ring": 32}
 
 
 def widths() -> list[int]:
@@ -50,7 +62,7 @@ def size_nodes(nodes: list[Node], ramp: dict[str, Any]) -> dict[str, PNode]:
     box_need = 0.0
     any_tag = any(n.tag for n in nodes)
     for n in nodes:
-        if SHAPE_BY_ROLE.get(n.role) != "rhombus":
+        if SHAPE_BY_ROLE.get(n.role) not in ("rhombus", "dot", "ring"):
             box_need = max(box_need, text_need(n, ramp) + 2 * PAD)
     w = pick(box_need, allowed)
     if w is None:
@@ -68,7 +80,9 @@ def size_nodes(nodes: list[Node], ramp: dict[str, Any]) -> dict[str, PNode]:
     for n in nodes:
         shape = SHAPE_BY_ROLE.get(n.role, "box")
         treatment = "focal" if n.focal else TREATMENT_BY_ROLE.get(n.role, "backend")
-        if shape == "rhombus":
+        if shape in MARKERS:
+            box = Box(0, 0, MARKERS[shape], MARKERS[shape])
+        elif shape == "rhombus":
             need = text_need(n, ramp) * 1.5 + 16
             rw = int(-(-need // 8) * 8) if need <= 320 else None
             if rw is None:

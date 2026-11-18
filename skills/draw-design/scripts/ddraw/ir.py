@@ -87,6 +87,7 @@ class PEdge:
     label_box: Box | None = None
     label_param: float = 0.0
     label_offset: Point = (0.0, 0.0)
+    bus: bool = False
 
 
 @dataclass

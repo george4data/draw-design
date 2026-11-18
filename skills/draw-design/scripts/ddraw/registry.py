@@ -25,6 +25,11 @@ class TypeInfo:
     aliases: tuple[str, ...] = ()
     use_when: str = ""
     budget: dict[str, int] = field(default_factory=dict)
+    edge_label_max: int = 14
+    upper_labels: bool = True
+    self_loops: bool = False
+    routing: str = "orthogonal"  # orthogonal | bus
+    legend_backend: str = "SERVICE"
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -65,6 +70,11 @@ def types() -> dict[str, TypeInfo]:
             default_direction=raw.get("defaultDirection", "LR"),
             aliases=tuple(raw.get("aliases", [])),
             use_when=raw.get("useWhen", ""),
+            edge_label_max=int(raw.get("edgeLabelMax", 14)),
+            upper_labels=bool(raw.get("upperLabels", True)),
+            self_loops=bool(raw.get("selfLoops", False)),
+            routing=str(raw.get("routing", "orthogonal")),
+            legend_backend=str(raw.get("legendBackend", "SERVICE")),
             budget={k: int(v) for k, v in raw.get("budget", {}).items()},
         )
         if info.slug != path.stem:

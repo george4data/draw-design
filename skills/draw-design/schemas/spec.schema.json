@@ -73,7 +73,7 @@
         "id": { "$ref": "#/$defs/id" },
         "from": { "$ref": "#/$defs/id" },
         "to": { "$ref": "#/$defs/id" },
-        "label": { "type": "string", "maxLength": 14 },
+        "label": { "type": "string", "maxLength": 32 },
         "kind": { "type": "string", "enum": ["default", "accent", "link", "async", "return"] },
         "bidirectional": { "type": "boolean" },
         "fromSide": { "type": "string", "enum": ["top", "right", "bottom", "left"] },

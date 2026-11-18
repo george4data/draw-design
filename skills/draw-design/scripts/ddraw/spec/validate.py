@@ -112,7 +112,7 @@ def semantic(spec: Spec) -> list[Finding]:
     node_ids = {n.id for n in spec.nodes}
     zone_ids = {z.id for z in spec.zones}
     roles = set(info.roles) or set(BASE_ROLES)
-    default_role = "step" if spec.type == "flowchart" else "backend"
+    default_role = {"flowchart": "step", "state": "state"}.get(spec.type, "backend")
     for i, n in enumerate(spec.nodes):
         if not n.role:
             n.role = default_role
@@ -141,7 +141,7 @@ def semantic(spec: Spec) -> list[Finding]:
                 out.append(
                     Finding("SPEC-023", f"edge endpoint {end!r} is not a node", pointer=f"/edges/{i}/{key}")
                 )
-        if e.src == e.dst and spec.type not in ("state",):
+        if e.src == e.dst and not info.self_loops:
             out.append(Finding("SPEC-024", "self-loops are not allowed for this type", pointer=f"/edges/{i}"))
         if (e.src, e.dst) in pairs:
             out.append(
@@ -162,6 +162,20 @@ def semantic(spec: Spec) -> list[Finding]:
                 )
             )
 
+    for i, e in enumerate(spec.edges):
+        if info.upper_labels:
+            e.label = e.label.upper()
+        if len(e.label) > info.edge_label_max:
+            out.append(
+                Finding(
+                    "LR-C007",
+                    f"edge label {e.label!r} is longer than {info.edge_label_max} characters",
+                    pointer=f"/edges/{i}/label",
+                    fix="shorten it or drop it if the layout implies it",
+                )
+            )
+    if info.routing == "bus":
+        out.extend(_tree_checks(spec))
     budget = registry.type_budget(spec.type, spec.detail)
     accents = sum(1 for n in spec.nodes if n.focal) + sum(1 for e in spec.edges if e.kind == "accent")
     if accents > budget["accent"]:
@@ -222,6 +236,60 @@ def semantic(spec: Spec) -> list[Finding]:
                                 fix="label every exit, e.g. YES / NO",
                             )
                         )
+    return out
+
+
+def _tree_checks(spec: Spec) -> list[Finding]:
+    out: list[Finding] = []
+    budget = registry.type_budget(spec.type, spec.detail)
+    parents: dict[str, list[str]] = {}
+    children: dict[str, list[str]] = {}
+    for e in spec.edges:
+        parents.setdefault(e.dst, []).append(e.src)
+        children.setdefault(e.src, []).append(e.dst)
+    for i, n in enumerate(spec.nodes):
+        if len(parents.get(n.id, [])) > 1:
+            out.append(
+                Finding(
+                    "LR-Y-tree-001",
+                    f"{n.id!r} has {len(parents[n.id])} parents; a tree has one",
+                    pointer=f"/nodes/{i}",
+                    fix="use an architecture or dependency diagram for fan-in",
+                )
+            )
+        if len(children.get(n.id, [])) > budget.get("breadth", 5):
+            out.append(
+                Finding(
+                    "LR-Y-tree-002",
+                    f"{n.id!r} has {len(children[n.id])} children; at most {budget.get('breadth', 5)}",
+                    pointer=f"/nodes/{i}",
+                    fix="group children under intermediate nodes (pods, teams)",
+                )
+            )
+    roots = [n.id for n in spec.nodes if n.id not in parents]
+    if not roots and spec.nodes:
+        out.append(Finding("LR-Y-tree-003", "no root: every node has a parent (cycle)", pointer="/edges"))
+    depth: dict[str, int] = {}
+
+    def walk(node: str, d: int, seen: frozenset[str]) -> None:
+        if node in seen:
+            return
+        depth[node] = max(depth.get(node, 0), d)
+        for c in children.get(node, []):
+            walk(c, d + 1, seen | {node})
+
+    for r in roots:
+        walk(r, 1, frozenset())
+    deepest = max(depth.values(), default=0)
+    if deepest > budget.get("depth", 4):
+        out.append(
+            Finding(
+                "LR-Y-tree-004",
+                f"tree is {deepest} levels deep; at most {budget.get('depth', 4)}",
+                pointer="/nodes",
+                fix="collapse a level or split into overview + subtree",
+            )
+        )
     return out
 
 

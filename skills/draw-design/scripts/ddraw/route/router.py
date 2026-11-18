@@ -73,7 +73,7 @@ def _port(box: Box, side: str, frac: float) -> Port:
 
 
 def _assign_ports(edges: list[PEdge], nodes: dict[str, PNode], direction: str) -> None:
-    single = {"rhombus", "ellipse", "pill"}
+    single = {"rhombus", "ellipse", "pill", "dot", "ring"}
     sides: dict[tuple[str, str], list[tuple[PEdge, bool]]] = {}
     for pe in edges:
         a, b = nodes[pe.edge.src], nodes[pe.edge.dst]
@@ -210,7 +210,9 @@ def _astar(
             if any(_overlaps(r, x1, y1, x2, y2) for r in routed):
                 continue
             step = abs(x2 - x1) + abs(y2 - y1)
-            c = cost + step + (BEND if nd != d else 0.0)
+            # Bends cost less near the goal, so jogs happen late and leave one long labellable run.
+            late = 0.05 * (abs(grid.xs[g[0]] - x1) + abs(grid.ys[g[1]] - y1))
+            c = cost + step + (BEND + late if nd != d else 0.0)
             c += CROSS * sum(1 for r in routed if _crosses(r, x1, y1, x2, y2))
             key2 = ((nx, ny), nd)
             if c < best.get(key2, float("inf")):
@@ -239,9 +241,73 @@ def path_length(path: list[Point]) -> float:
     return sum(abs(b[0] - a[0]) + abs(b[1] - a[1]) for a, b in itertools.pairwise(path))
 
 
+def _route_bus(edges: list[PEdge], nodes: dict[str, PNode], direction: str) -> None:
+    """Tree connectors: parent drop -> shared bus -> child drops. Siblings share trunk and bus."""
+    lr = direction in ("LR", "RL")
+    by_parent: dict[str, list[PEdge]] = {}
+    for pe in edges:
+        by_parent.setdefault(pe.edge.src, []).append(pe)
+    for pid, group in by_parent.items():
+        pb = nodes[pid].box
+        kids = [nodes[pe.edge.dst].box for pe in group]
+        if lr:
+            near = min(k.x for k in kids)
+            bus = round((pb.right + near) / 2 / 4) * 4
+        else:
+            near = min(k.y for k in kids)
+            bus = round((pb.bottom + near) / 2 / 4) * 4
+        for pe in group:
+            cb = nodes[pe.edge.dst].box
+            pe.bus = True
+            if lr:
+                pe.src_port = Port("right", pb.right, round(pb.cy), 1.0, 0.5)
+                pe.dst_port = Port("left", cb.x, round(cb.cy), 0.0, 0.5)
+                pts: list[Point] = [
+                    (pb.right, round(pb.cy)),
+                    (bus, round(pb.cy)),
+                    (bus, round(cb.cy)),
+                    (cb.x, round(cb.cy)),
+                ]
+            else:
+                pe.src_port = Port("bottom", round(pb.cx), pb.bottom, 0.5, 1.0)
+                pe.dst_port = Port("top", round(cb.cx), cb.y, 0.5, 0.0)
+                pts = [
+                    (round(pb.cx), pb.bottom),
+                    (round(pb.cx), bus),
+                    (round(cb.cx), bus),
+                    (round(cb.cx), cb.y),
+                ]
+            pe.path = _simplify(pts)
+
+
+def _route_loops(loops: list[PEdge], nodes: dict[str, PNode]) -> None:
+    """Self-transitions (state machines): a small loop above the box."""
+    for pe in loops:
+        b = nodes[pe.edge.src].box
+        x1, x2 = round(b.x + b.w * 0.3), round(b.x + b.w * 0.7)
+        top = b.y - 24
+        pe.src_port = Port("top", x1, b.y, 0.3, 0.0)
+        pe.dst_port = Port("top", x2, b.y, 0.7, 0.0)
+        pe.path = [(x1, b.y), (x1, top), (x2, top), (x2, b.y)]
+
+
 def route(
-    edges: list[PEdge], nodes: dict[str, PNode], frame: Box, direction: str, ramp: dict[str, int]
+    edges: list[PEdge],
+    nodes: dict[str, PNode],
+    frame: Box,
+    direction: str,
+    ramp: dict[str, int],
+    mode: str = "orthogonal",
 ) -> None:
+    loops = [pe for pe in edges if pe.edge.src == pe.edge.dst]
+    _route_loops(loops, nodes)
+    if mode == "bus":
+        normal = [pe for pe in edges if pe.edge.src != pe.edge.dst]
+        _route_bus(normal, nodes, direction)
+        _labels_only(edges, nodes, ramp)
+        return
+    edges_all = edges
+    edges = [pe for pe in edges if pe.edge.src != pe.edge.dst]
     _assign_ports(edges, nodes, direction)
     order = sorted(
         edges,
@@ -298,6 +364,12 @@ def route(
             routed += [Seg(a[0], a[1], b[0], b[1], pe.edge.id) for a, b in itertools.pairwise(path)]
     if findings:
         raise DDError(findings)
+    _labels_only(edges_all, nodes, ramp)
+
+
+def _labels_only(edges: list[PEdge], nodes: dict[str, PNode], ramp: dict[str, int]) -> None:
+    findings: list[Finding] = []
+    routed = [Seg(a[0], a[1], b[0], b[1], pe.edge.id) for pe in edges for a, b in itertools.pairwise(pe.path)]
     labels: list[Box] = []
     for pe in edges:
         if pe.edge.label:

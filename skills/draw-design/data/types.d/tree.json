@@ -4,11 +4,38 @@
   "family": "structural",
   "grammar": "tree",
   "wave": 1,
-  "status": "planned",
+  "status": "shipped",
   "feasibility": "easy",
   "budget": {
-    "depth": 4
+    "nodes": 9,
+    "edges": 12,
+    "accent": 2,
+    "depth": 4,
+    "breadth": 5
   },
   "reference": "references/type-tree.md",
-  "example": "examples/tree.dd.json"
+  "example": "examples/tree.dd.json",
+  "roles": [
+    "backend",
+    "store",
+    "external",
+    "input",
+    "optional",
+    "security"
+  ],
+  "directions": [
+    "TB",
+    "LR"
+  ],
+  "defaultDirection": "TB",
+  "routing": "bus",
+  "aliases": [
+    "tree",
+    "hierarchy",
+    "taxonomy",
+    "file tree",
+    "breakdown"
+  ],
+  "useWhen": "A strict parent \u2192 children hierarchy (taxonomy, breakdown, file tree).",
+  "legendBackend": "NODE"
 }

@@ -4,9 +4,37 @@
   "family": "process",
   "grammar": "layered",
   "wave": 1,
-  "status": "planned",
+  "status": "shipped",
   "feasibility": "easy",
-  "budget": {},
+  "budget": {
+    "nodes": 9,
+    "edges": 12,
+    "accent": 2
+  },
   "reference": "references/type-state.md",
-  "example": "examples/state.dd.json"
+  "example": "examples/state.dd.json",
+  "roles": [
+    "initial",
+    "state",
+    "final",
+    "optional",
+    "external",
+    "security"
+  ],
+  "directions": [
+    "LR",
+    "TB"
+  ],
+  "defaultDirection": "LR",
+  "edgeLabelMax": 28,
+  "upperLabels": false,
+  "selfLoops": true,
+  "aliases": [
+    "state machine",
+    "state diagram",
+    "lifecycle",
+    "status transitions"
+  ],
+  "useWhen": "States of one subject and the events that move it between them, with guards.",
+  "legendBackend": "STATE"
 }

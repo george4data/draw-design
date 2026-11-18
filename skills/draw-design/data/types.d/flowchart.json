@@ -37,5 +37,6 @@
     "process flow",
     "decision tree"
   ],
-  "useWhen": "Decision logic with branches; every exit of a decision is labelled."
+  "useWhen": "Decision logic with branches; every exit of a decision is labelled.",
+  "legendBackend": "STEP"
 }

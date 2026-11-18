@@ -36,7 +36,7 @@ def mutate(fn: Any) -> dict[str, Any]:
         (lambda d: d.update(ddVersion=2), ("SPEC-003", "/ddVersion")),
         (lambda d: d["nodes"][0].update(label="x" * 33), ("SPEC-006", "/nodes/0/label")),
         (lambda d: d["nodes"][0].update(id="Bad Id"), ("SPEC-007", "/nodes/0/id")),
-        (lambda d: d["edges"][0].update(label="A VERY LONG LABEL"), ("SPEC-006", "/edges/0/label")),
+        (lambda d: d["edges"][0].update(label="A VERY LONG LABEL"), ("LR-C007", "/edges/0/label")),
         (lambda d: d.update(type="sequencee"), ("SPEC-010", "/type")),
         (lambda d: d.update(type="sankey"), ("SPEC-011", "/type")),
         (lambda d: d["nodes"][1].update(id="web"), ("SPEC-020", "/nodes/1/id")),

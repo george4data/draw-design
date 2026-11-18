@@ -108,6 +108,8 @@ def edge_geom(
 
 
 def node_label(pn: PNode, theme: Theme, ramp: dict[str, int]) -> str:
+    if pn.shape in ("dot", "ring"):
+        return ""
     name = (
         f'<div style="font-family:{theme.font("sans")};font-weight:600;font-size:{ramp["node"]}px;'
         f'line-height:1.25">{esc(pn.node.label)}</div>'
@@ -209,6 +211,8 @@ def write(page: Page, theme: Theme) -> str:
     for pn in sorted(page.nodes.values(), key=lambda p: p.node.index):
         pid, ox, oy = node_parent(pn)
         user = {"dd-role": pn.node.role, "dd-id": pn.id, "dd-treatment": pn.treatment}
+        if pn.shape in ("dot", "ring"):
+            user["tooltip"] = pn.node.label
         if pn.node.focal:
             user["dd-focal"] = "1"
         for k, v in sorted(pn.node.meta.items()):
@@ -361,5 +365,6 @@ def _write_edge(
             "dd-id": e.id,
             "dd-kind": e.kind,
             **({"dd-transit": "1"} if e.transit else {}),
+            **({"dd-bus": "1"} if pe.bus else {}),
         },
     )

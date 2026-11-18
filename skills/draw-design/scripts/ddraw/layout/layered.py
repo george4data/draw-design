@@ -175,13 +175,8 @@ def layout(
         return b.h if lr else b.w
 
     # Gap between ranks: room for stubs, labels and zone padding.
-    label_need = 0.0
-    for e in spec.edges:
-        if e.label:
-            lw = width(e.label, ramp["arrow"], "mono", 0.06) + 8
-            label_need = max(label_need, (lw + 2 * STUB + 16) if lr else 48)
     zone_need = (2 * ZONE_PAD + 16) if lr else (ZONE_PAD + ZONE_LABEL + 16)
-    min_gap_u = ceil4(max(64 if lr else 48, label_need, zone_need if has_zones else 0))
+    min_gap_u = ceil4(max(64 if lr else 48, zone_need if has_zones else 0))
     gap_v = max(32, int(ramp["minGap"]))
 
     band = [max((su(i) for i in layer), default=0.0) for layer in layers]
@@ -202,13 +197,26 @@ def layout(
         lo, hi = sorted((rank[e.src], rank[e.dst]))
         for r in range(lo, hi):
             crossing[r] += 1
-    need = [ceil4(max(min_gap_u, 2 * STUB + 16 + 12 * max(0, k - 1))) for k in crossing]
-    if n_ranks > 1:
-        g = (avail_u - total_u_nodes) / (n_ranks - 1)
-        even = max(min_gap_u, min(max_gap_u, (int(g) // 4) * 4))
-        gaps = [max(even, n) for n in need] if not fit else need
-    else:
-        gaps = []
+    # A labelled edge needs its label width (plus clearance) inside every gap it can be labelled in.
+    label_need = [0.0] * max(0, n_ranks - 1)
+    for e in spec.edges:
+        if not e.label or e.src == e.dst:
+            continue
+        lo, hi = sorted((rank[e.src], rank[e.dst]))
+        lw = width(e.label, ramp["arrow"], "mono", 0.06) + 8
+        for r in range(lo, hi):
+            label_need[r] = max(label_need[r], (lw + 44) if lr else 48)
+    need = [
+        ceil4(max(min_gap_u, label_need[r], 2 * STUB + 16 + 12 * max(0, k - 1)))
+        for r, k in enumerate(crossing)
+    ]
+    gaps = list(need)
+    if n_ranks > 1 and not fit:
+        # Start from each gap's minimum, then spread the leftover space evenly (capped).
+        leftover = avail_u - total_u_nodes - sum(gaps)
+        if leftover > 0:
+            extra = leftover / (n_ranks - 1)
+            gaps = [max(g, min(max_gap_u, (int(g + extra) // 4) * 4)) for g in gaps]
 
     # u centres.
     u_center: dict[str, float] = {}

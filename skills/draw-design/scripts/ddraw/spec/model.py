@@ -108,7 +108,7 @@ def from_dict(d: dict[str, Any]) -> Spec:
             id=e.get("id", f"e{i + 1}"),
             src=e["from"],
             dst=e["to"],
-            label=e.get("label", "").upper(),
+            label=e.get("label", ""),
             kind=e.get("kind", "default"),
             bidirectional=bool(e.get("bidirectional", False)),
             from_side=e.get("fromSide", ""),

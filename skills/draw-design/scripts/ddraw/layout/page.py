@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from ddraw import registry
 from ddraw.ir import Box, LegendItem, Page, TextItem
 from ddraw.text.measure import ceil4, width
 
@@ -68,7 +69,8 @@ def legend_items(page: Page) -> tuple[list[tuple[str, str]], list[tuple[str, str
         node_keys = [k for k in node_keys if k != "backend"]
     if len(edge_keys) <= 1:
         edge_keys = [k for k in edge_keys if k != "default"]
-    backend_label = "STEP" if page.spec.type == "flowchart" else NODE_LABELS["backend"]
+    info = registry.types().get(page.spec.type)
+    backend_label = info.legend_backend if info else NODE_LABELS["backend"]
     nodes = [(k, backend_label if k == "backend" else NODE_LABELS[k]) for k in node_keys]
     edges = [(k, EDGE_LABELS[k]) for k in edge_keys]
     return nodes, edges

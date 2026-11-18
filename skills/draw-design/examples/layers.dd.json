@@ -1,0 +1,41 @@
+{
+  "ddVersion": 1,
+  "type": "layers",
+  "title": "Agent platform stack",
+  "description": "An agent platform stacks the user interface on orchestration, tools, models and the data layer.",
+  "nodes": [
+    {
+      "id": "ui",
+      "label": "Chat and IDE surfaces",
+      "sublabel": "web \u00b7 vscode \u00b7 slack",
+      "tag": "L5"
+    },
+    {
+      "id": "orch",
+      "label": "Orchestration",
+      "sublabel": "planner \u00b7 memory \u00b7 policies",
+      "tag": "L4",
+      "focal": true
+    },
+    {
+      "id": "tools",
+      "label": "Tools and connectors",
+      "sublabel": "MCP servers",
+      "tag": "L3"
+    },
+    {
+      "id": "models",
+      "label": "Models",
+      "sublabel": "hosted LLM APIs",
+      "tag": "L2",
+      "role": "external"
+    },
+    {
+      "id": "data",
+      "label": "Data",
+      "sublabel": "vector store \u00b7 warehouse",
+      "tag": "L1",
+      "role": "store"
+    }
+  ]
+}

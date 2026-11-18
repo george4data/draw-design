@@ -1,0 +1,85 @@
+{
+  "ddVersion": 1,
+  "type": "state",
+  "title": "Order lifecycle",
+  "description": "An order waits for payment, is paid, shipped and delivered; unpaid orders time out and are cancelled.",
+  "size": "doc-wide",
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Created",
+      "role": "initial"
+    },
+    {
+      "id": "pending",
+      "label": "Pending payment",
+      "sublabel": "awaiting_payment"
+    },
+    {
+      "id": "paid",
+      "label": "Paid",
+      "sublabel": "paid"
+    },
+    {
+      "id": "shipped",
+      "label": "Shipped",
+      "sublabel": "in_transit"
+    },
+    {
+      "id": "delivered",
+      "label": "Delivered",
+      "sublabel": "delivered",
+      "focal": true
+    },
+    {
+      "id": "cancelled",
+      "label": "Cancelled",
+      "sublabel": "cancelled",
+      "role": "optional"
+    },
+    {
+      "id": "done",
+      "label": "Closed",
+      "role": "final"
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "pending"
+    },
+    {
+      "from": "pending",
+      "to": "pending",
+      "label": "retry [attempts < 3]"
+    },
+    {
+      "from": "pending",
+      "to": "paid",
+      "label": "pay / capture"
+    },
+    {
+      "from": "pending",
+      "to": "cancelled",
+      "label": "timeout [24h]"
+    },
+    {
+      "from": "paid",
+      "to": "shipped",
+      "label": "ship"
+    },
+    {
+      "from": "shipped",
+      "to": "delivered",
+      "label": "deliver"
+    },
+    {
+      "from": "delivered",
+      "to": "done"
+    },
+    {
+      "from": "cancelled",
+      "to": "done"
+    }
+  ]
+}

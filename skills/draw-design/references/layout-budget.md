@@ -41,13 +41,13 @@
 | `architecture` | shipped | nodes 9, edges 12, zones 3, accent 2 |
 | `er` | planned | entities 8 |
 | `flowchart` | shipped | nodes 9, edges 12, accent 2, decisionExits 3 |
-| `layers` | planned | layers 6 |
+| `layers` | shipped | nodes 6, edges 5, accent 2, layers 6 |
 | `nested` | planned | levels 6 |
-| `org-chart` | planned | nodes 12, depth 4 |
+| `org-chart` | shipped | nodes 12, edges 12, accent 2, depth 4, breadth 5 |
 | `sequence` | planned | lifelines 5 |
-| `state` | planned | universal |
+| `state` | shipped | nodes 9, edges 12, accent 2 |
 | `swimlane` | planned | lanes 5 |
-| `tree` | planned | depth 4 |
+| `tree` | shipped | nodes 9, edges 12, accent 2, depth 4, breadth 5 |
 | `bar` | planned | bars 8 |
 | `db-schema` | planned | nodes 5, edges 6 |
 | `dependency` | planned | edges 14 |

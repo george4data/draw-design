@@ -155,6 +155,19 @@ def node_style(theme: Theme, treatment_name: str, shape: str, has_tag: bool, ske
         base = "rhombus"
         pairs = [(k, v) for k, v in pairs if k not in ("rounded", "arcSize", "absoluteArcSize")]
         pairs += [("perimeter", "rhombusPerimeter")]
+    elif shape in ("dot", "ring"):
+        base = "ellipse" if shape == "dot" else ""
+        drop = ("rounded", "arcSize", "absoluteArcSize", "fillColor", "strokeColor")
+        pairs = [(k, v) for k, v in pairs if k not in drop]
+        pairs += [
+            ("fillColor", theme.c("ink")),
+            ("strokeColor", theme.c("ink")),
+            ("perimeter", "ellipsePerimeter"),
+        ]
+        if shape == "ring":
+            pairs += [("shape", "doubleEllipse")]
+    elif shape == "state":
+        pairs = [(k, str(theme.raw["radius"]["lg"]) if k == "arcSize" else v) for k, v in pairs]
     elif shape == "ellipse":
         base = "ellipse"
         pairs = [(k, v) for k, v in pairs if k not in ("rounded", "arcSize", "absoluteArcSize")]

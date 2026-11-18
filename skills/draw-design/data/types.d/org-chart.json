@@ -4,12 +4,38 @@
   "family": "structural",
   "grammar": "tree",
   "wave": 1,
-  "status": "planned",
+  "status": "shipped",
   "feasibility": "easy",
   "budget": {
     "nodes": 12,
-    "depth": 4
+    "edges": 12,
+    "accent": 2,
+    "depth": 4,
+    "breadth": 5
   },
   "reference": "references/type-org-chart.md",
-  "example": "examples/org-chart.dd.json"
+  "example": "examples/org-chart.dd.json",
+  "roles": [
+    "backend",
+    "external",
+    "input",
+    "optional",
+    "security"
+  ],
+  "directions": [
+    "TB",
+    "LR"
+  ],
+  "defaultDirection": "TB",
+  "routing": "bus",
+  "aliases": [
+    "org chart",
+    "organisation chart",
+    "organization chart",
+    "reporting lines",
+    "escalation",
+    "ownership"
+  ],
+  "useWhen": "Who owns, routes or escalates what: people, teams or agents with reporting lines.",
+  "legendBackend": "OWNER"
 }

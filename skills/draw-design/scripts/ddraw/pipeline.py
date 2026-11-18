@@ -10,7 +10,7 @@ from ddraw import registry
 from ddraw.emit import mxgraph
 from ddraw.errors import DDError, Finding
 from ddraw.ir import Box, Page, PEdge, TextItem
-from ddraw.layout import layered, sizing
+from ddraw.layout import bands, layered, sizing, tree
 from ddraw.layout import page as page_mod
 from ddraw.lint.runner import lint_text
 from ddraw.route import router
@@ -115,7 +115,18 @@ def compose(spec: Spec, theme: Theme) -> Page:
         content_top += 24
     area = Box(safe, content_top, fw - 2 * safe, bottom - content_top)
     page.content = area
-    if info.grammar == "layered":
+    if info.grammar == "bands":
+        bands.layout(spec, page.nodes, area, ramp, fit)
+    elif info.grammar == "tree":
+        try:
+            tree.layout(spec, page.nodes, area, direction, fit)
+        except DDError:
+            alt = next((d for d in info.directions if d != direction), "")
+            if spec.direction or not alt:
+                raise
+            direction = page.direction = alt
+            tree.layout(spec, page.nodes, area, direction, fit)
+    elif info.grammar == "layered":
         try:
             page.zones = layered.layout(
                 spec, page.nodes, area, direction, ramp, fit=fit, bias=type_conventions(spec, direction)
@@ -156,7 +167,7 @@ def compose(spec: Spec, theme: Theme) -> Page:
         fh = ceil4(lowest + 24 + strip + safe)
         page.frame = Box(0, 0, fw, fh)
         page.content = Box(safe, content_top, fw - 2 * safe, lowest - content_top)
-    router.route(page.edges, page.nodes, page.frame.inflate(-8), direction, ramp)
+    router.route(page.edges, page.nodes, page.frame.inflate(-8), direction, ramp, mode=info.routing)
     if has_legend:
         page_mod.legend(page, page.frame.h - safe - strip)
     for i, c in enumerate(spec.callouts):

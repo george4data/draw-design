@@ -1,0 +1,72 @@
+{
+  "ddVersion": 1,
+  "type": "org-chart",
+  "title": "Support escalation",
+  "description": "Customer requests enter through the support desk, which routes them to billing, technical or account teams, with engineering on call behind technical support.",
+  "nodes": [
+    {
+      "id": "desk",
+      "label": "Support desk",
+      "sublabel": "#help \u00b7 triage",
+      "focal": true
+    },
+    {
+      "id": "billing",
+      "label": "Billing team",
+      "sublabel": "refunds, invoices"
+    },
+    {
+      "id": "tech",
+      "label": "Technical support",
+      "sublabel": "bugs, outages"
+    },
+    {
+      "id": "accounts",
+      "label": "Account managers",
+      "sublabel": "enterprise"
+    },
+    {
+      "id": "oncall",
+      "label": "Engineering on-call",
+      "sublabel": "pager"
+    },
+    {
+      "id": "finance",
+      "label": "Finance",
+      "sublabel": "approvals",
+      "role": "external"
+    },
+    {
+      "id": "bot",
+      "label": "Triage agent",
+      "sublabel": "not live yet",
+      "role": "optional"
+    }
+  ],
+  "edges": [
+    {
+      "from": "desk",
+      "to": "billing"
+    },
+    {
+      "from": "desk",
+      "to": "tech"
+    },
+    {
+      "from": "desk",
+      "to": "accounts"
+    },
+    {
+      "from": "tech",
+      "to": "oncall"
+    },
+    {
+      "from": "billing",
+      "to": "finance"
+    },
+    {
+      "from": "accounts",
+      "to": "bot"
+    }
+  ]
+}

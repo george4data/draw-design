@@ -1,0 +1,86 @@
+{
+  "ddVersion": 1,
+  "type": "tree",
+  "title": "Platform monorepo",
+  "description": "The platform monorepo splits into apps, shared packages and infrastructure, each with its own modules.",
+  "nodes": [
+    {
+      "id": "root",
+      "label": "platform",
+      "sublabel": "pnpm workspace",
+      "focal": true
+    },
+    {
+      "id": "apps",
+      "label": "apps"
+    },
+    {
+      "id": "packages",
+      "label": "packages"
+    },
+    {
+      "id": "infra",
+      "label": "infra",
+      "role": "store"
+    },
+    {
+      "id": "web",
+      "label": "web",
+      "sublabel": "next.js"
+    },
+    {
+      "id": "admin",
+      "label": "admin",
+      "sublabel": "vite"
+    },
+    {
+      "id": "ui",
+      "label": "ui",
+      "sublabel": "design system"
+    },
+    {
+      "id": "sdk",
+      "label": "sdk",
+      "sublabel": "api client"
+    },
+    {
+      "id": "tf",
+      "label": "terraform",
+      "role": "store"
+    }
+  ],
+  "edges": [
+    {
+      "from": "root",
+      "to": "apps"
+    },
+    {
+      "from": "root",
+      "to": "packages"
+    },
+    {
+      "from": "root",
+      "to": "infra"
+    },
+    {
+      "from": "apps",
+      "to": "web"
+    },
+    {
+      "from": "apps",
+      "to": "admin"
+    },
+    {
+      "from": "packages",
+      "to": "ui"
+    },
+    {
+      "from": "packages",
+      "to": "sdk"
+    },
+    {
+      "from": "infra",
+      "to": "tf"
+    }
+  ]
+}

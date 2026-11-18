@@ -354,10 +354,13 @@ def c002(page: DrawPage, ctx: Context) -> list[Finding]:
 def c003(page: DrawPage, ctx: Context) -> list[Finding]:
     out = []
     segs = [(c.id, a, b) for c in _edges(page) if not _exempt(c) for a, b in _segments(c)]
+    bus_src = {c.id: c.source for c in _edges(page) if c.attrs.get("dd-bus") == "1"}
     reported: set[tuple[str, str]] = set()
     for (ia, a1, a2), (ib, b1, b2) in itertools.combinations(segs, 2):
         if ia == ib or (ia, ib) in reported:
             continue
+        if ia in bus_src and ib in bus_src and bus_src[ia] == bus_src[ib]:
+            continue  # tree siblings share their parent's trunk and bus by design
         if a1[1] == a2[1] and b1[1] == b2[1] and abs(a1[1] - b1[1]) < 12:
             ov = min(max(a1[0], a2[0]), max(b1[0], b2[0])) - max(min(a1[0], a2[0]), min(b1[0], b2[0]))
         elif a1[0] == a2[0] and b1[0] == b2[0] and abs(a1[0] - b1[0]) < 12:
@@ -382,6 +385,8 @@ def c004(page: DrawPage, ctx: Context) -> list[Finding]:
     out = []
     ports: dict[tuple[str, str], list[float]] = {}
     for c in _edges(page):
+        if c.attrs.get("dd-bus") == "1" or c.source == c.target:
+            continue
         for cid, prefix in ((c.source, "exit"), (c.target, "entry")):
             cell = page.cells.get(cid)
             if cell is None or cell.abs_box is None or f"{prefix}X" not in c.style:
@@ -477,15 +482,21 @@ def c006(page: DrawPage, ctx: Context) -> list[Finding]:
 
 def c007(page: DrawPage, ctx: Context) -> list[Finding]:
     out = []
+    info = registry.types().get(ctx.dtype)
+    limit = info.edge_label_max if info else 14
+    upper = info.upper_labels if info else True
     for c in _edges(page):
         t = c.text.strip()
-        if len(t) > 14:
+        if len(t) > limit:
             out.append(
                 Finding(
-                    "LR-C007", f"edge label {t!r} is longer than 14 characters", cell=c.id, severity="warn"
+                    "LR-C007",
+                    f"edge label {t!r} is longer than {limit} characters",
+                    cell=c.id,
+                    severity="warn",
                 )
             )
-        elif t and t != t.upper():
+        elif upper and t and t != t.upper():
             out.append(Finding("LR-C007", f"edge label {t!r} is not uppercase", cell=c.id, severity="warn"))
     return out
 
