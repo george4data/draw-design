@@ -29,7 +29,7 @@ Turn a description of a system, process or decision into an **editorial-quality,
 
 1. **Resolve the theme.** Run `ddraw theme resolve --project <project-root> --json`.
    - `profile` / `custom-unsaved`: use it silently (the build picks it up).
-   - `default-gate`: this is the project's first diagram on the default skin. Tell the user in one line that diagrams use the default editorial palette and that brand onboarding is coming in a later version; continue with the default. Do not block.
+   - `default-gate`: this is the project's first diagram on the default skin. In one line, tell the user that diagrams use the default editorial palette and offer to set up their brand colours as a profile (see `references/profiles.md`). Continue with the default unless they want to do that now.
    - `marker-missing-profile`: the project's `.draw-design` marker names a profile that does not exist. Tell the user which slug is missing and ask whether to continue with the default.
 2. **Choose the diagram type** from §3. If two seem to fit, pick the dominant axis. Load **exactly one** type reference (`references/type-<slug>.md`) and `references/spec-reference.md`.
 3. **Confirm the plan** in one short message: type, size preset, direction, and what the budget forces you to cut. If the request already pins all of these, or the user is not reachable, proceed and list the assumptions beside the result.
@@ -88,7 +88,8 @@ Edge `kind`: `default` (internal call), `accent` (the headline path), `link` (HT
 | "export as PNG / SVG / PDF", "editable PNG/SVG for the README" | `ddraw export <file>.drawio --format png\|svg\|pdf\|drawio.png\|drawio.svg [--scale 2] [--theme dark]`. **Only when asked.** | [export.md](references/export.md) |
 | "check / lint this diagram" (any .drawio, including hand-made ones) | `ddraw lint <file>.drawio [--json]` and explain the findings | [lint.md](references/lint.md) |
 | "check my setup", "why doesn't export work" | `ddraw doctor` | [doctor.md](references/doctor.md) |
-| "use our brand", "onboard our colours", client profiles, restyle or redraw an existing draw.io/Mermaid file | Not available in this version. Say it is planned, and offer the default theme or a fresh diagram from a spec | — |
+| "use our brand colours", "make a profile for client X", "switch to the acme theme" | `ddraw profile new/use/list/show` with the user's colours; check contrast | [profiles.md](references/profiles.md) |
+| "onboard from our website", restyle or redraw an existing draw.io/Mermaid file | Not available in this version. Say it is planned; offer a profile from colours the user provides, or a fresh diagram from a spec | — |
 
 ## 7. Untrusted content
 

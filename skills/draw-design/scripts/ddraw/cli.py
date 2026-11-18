@@ -193,6 +193,59 @@ def cmd_theme(a: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def cmd_profile(a: argparse.Namespace) -> int:
+    from ddraw.theme import profiles
+
+    verb = a.verb
+    if verb == "list":
+        items = profiles.list_profiles()
+        if a.json:
+            print(json.dumps(items, indent=2))
+        elif not items:
+            _err("no saved profiles yet (create one with: ddraw profile new <slug> --name <Name>)")
+        else:
+            for p in items:
+                print(
+                    f"{p['slug']:20} {p.get('name', ''):24} {p.get('updated', ''):10} {p.get('status', '')}"
+                )
+        return EXIT_OK
+    if not a.slug:
+        _err(f"`ddraw profile {verb}` needs a slug")
+        return EXIT_USAGE
+    if verb == "new":
+        path, findings = profiles.create(
+            a.slug,
+            a.name or a.slug,
+            source=Path(a.source) if a.source else None,
+            source_url=a.source_url or "",
+            notes=a.notes or "",
+            force=a.force,
+        )
+        _err(f"wrote {path}")
+        return _report(findings, a.json, {"output": str(path)})
+    if verb == "show":
+        print(json.dumps(profiles.show(a.slug), indent=2))
+        return EXIT_OK
+    if verb == "use":
+        marker = profiles.use(a.slug, Path(a.project or "."))
+        _err(f"wrote {marker} (profile: {a.slug})")
+        return EXIT_OK
+    if verb == "load":
+        _err(f"active theme: {profiles.load(a.slug)}")
+        return EXIT_OK
+    if verb == "reset":
+        _err(f"active theme: {profiles.reset()}")
+        return EXIT_OK
+    if verb == "delete":
+        if not a.yes:
+            _err("deleting a profile cannot be undone: confirm with the user, then pass --yes")
+            return EXIT_USAGE
+        _err(f"deleted {profiles.delete(a.slug)}")
+        return EXIT_OK
+    _err(f"unknown verb {verb!r}")
+    return EXIT_USAGE
+
+
 def not_implemented(name: str) -> Callable[[argparse.Namespace], int]:
     def run(_: argparse.Namespace) -> int:
         _err(f"`ddraw {name}` is not implemented yet (see docs/prd.md §22 for its milestone)")
@@ -282,8 +335,20 @@ def parser() -> argparse.ArgumentParser:
     th.add_argument("--json", action="store_true")
     th.set_defaults(fn=cmd_theme)
 
+    pr = sub.add_parser("profile", help="client profiles in ~/.draw-design/profiles")
+    pr.add_argument("verb", choices=["list", "new", "show", "use", "load", "reset", "delete"])
+    pr.add_argument("slug", nargs="?")
+    pr.add_argument("--name")
+    pr.add_argument("--source", help="theme JSON to copy (default: the shipped default theme)")
+    pr.add_argument("--source-url")
+    pr.add_argument("--notes")
+    pr.add_argument("--project", help="project root for `use` (default: current directory)")
+    pr.add_argument("--force", action="store_true", help="overwrite an existing profile (`new`)")
+    pr.add_argument("--yes", action="store_true", help="confirm `delete`")
+    pr.add_argument("--json", action="store_true")
+    pr.set_defaults(fn=cmd_profile)
+
     for name, helptext in (
-        ("profile", "client profiles"),
         ("import", "restyle or redraw a diagram"),
         ("digest", "import digest"),
         ("icons", "icon catalog"),
@@ -318,4 +383,5 @@ def main(argv: list[str] | None = None) -> int:
         codes = {f.code for f in exc.findings}
         if codes & {"EXPORT-001"}:
             return EXIT_ENV
-        return EXIT_USAGE if any(c.startswith(("SPEC", "EXPORT", "THEME")) for c in codes) else EXIT_FINDINGS
+        usage = ("SPEC", "EXPORT", "THEME", "PROFILE")
+        return EXIT_USAGE if any(c.startswith(usage) for c in codes) else EXIT_FINDINGS
