@@ -1,6 +1,6 @@
 ---
 description: Export a draw.io diagram to PNG, SVG, PDF or an editable .drawio.png / .drawio.svg
-argument-hint: "<file.drawio> [--format png|svg|pdf|drawio.png|drawio.svg] [--scale N] [--page N] [--theme light|dark] [-o path]"
+argument-hint: "<file.drawio> [--format png|svg|pdf|drawio.png|drawio.svg] [--scale N] [--page N] [-o path]"
 allowed-tools: [Bash, Read]
 ---
 

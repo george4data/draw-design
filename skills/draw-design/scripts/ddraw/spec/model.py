@@ -65,7 +65,6 @@ class Spec:
     detail: str = "balanced"
     audience: str = "mixed"
     direction: str = ""
-    variant: str = "light"
     sketch: bool = False
     pattern: str = ""
     icon_style: str = ""
@@ -176,7 +175,6 @@ def from_dict(d: dict[str, Any]) -> Spec:
         detail=d.get("detail", "balanced"),
         audience=d.get("audience", "mixed"),
         direction=d.get("direction", ""),
-        variant=d.get("variant", "light"),
         sketch=bool(d.get("sketch", False)),
         pattern=d.get("pattern", ""),
         icon_style=d.get("iconStyle", ""),

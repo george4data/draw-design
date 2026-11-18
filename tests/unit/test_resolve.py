@@ -34,7 +34,7 @@ def test_resolution_statuses(tmp_path: Path, isolated_home: Path) -> None:
     prof = isolated_home / "profiles"
     prof.mkdir(parents=True)
     raw = json.loads((THEMES_DIR / "default.json").read_text())
-    raw["light"]["accent"] = "#005f73"
+    raw["colors"]["accent"] = "#005f73"
     (prof / "acme.json").write_text(json.dumps(raw))
     res = resolve(tmp_path)
     assert (res.status, res.slug) == ("profile", "acme")

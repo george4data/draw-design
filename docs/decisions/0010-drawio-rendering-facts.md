@@ -1,6 +1,6 @@
 # ADR 0010: draw.io rendering behaviour the emitter relies on
 
-**Status:** accepted (2026-11-17), verified against draw.io Desktop 32.7.4
+**Status:** accepted (2026-11-17), verified against draw.io Desktop 32.7.4. Items 4–5 are superseded by [ADR 0011](0011-no-dark-mode.md).
 
 ## Context
 

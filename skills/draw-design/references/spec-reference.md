@@ -14,7 +14,6 @@ The spec is the only thing you write. `ddraw build` validates it strictly: **unk
 | `subtitle` | no | — | ≤ 120 chars |
 | `size` | no | `doc-inline` | `doc-inline` 960×600 · `doc-wide` 1280×720 · `slide-16x9` 1280×720 (bigger type) · `slide-4x3` · `social-og` · `social-square` · `print-a4-landscape` · `print-a3-landscape` · `print-letter-landscape` · `fit` (frame grows to the content) |
 | `direction` | no | type default | `LR` or `TB` (also `RL`, `BT`). Leave it out to let the compiler try the type default, then the alternative |
-| `variant` | no | `light` | `light` or `dark` (primary skin). Colours are emitted as `light-dark()`, so either file also renders in draw.io's dark mode |
 | `detail` | no | `balanced` | `simplified` (≤ 7 nodes) · `balanced` (≤ 12) · `faithful` (≤ 24, zones required above 9) |
 | `audience` | no | `mixed` | `engineer` · `mixed` · `executive`: governs wording, which is your job |
 | `nodes`, `edges`, `zones`, `callouts` | — | `[]` | below |

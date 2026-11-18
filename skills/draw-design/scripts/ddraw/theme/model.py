@@ -1,4 +1,4 @@
-"""Theme model: semantic tokens for a light and a dark skin, bound to draw.io colours."""
+"""Theme model: semantic colour and font tokens, bound to draw.io colours."""
 
 from __future__ import annotations
 
@@ -30,8 +30,6 @@ FONT_ROLES = ("title", "sans", "mono", "callout")
 @dataclass
 class Theme:
     raw: dict[str, Any]
-    adaptive: bool = True
-    primary: str = "light"
 
     @property
     def name(self) -> str:
@@ -41,30 +39,28 @@ class Theme:
     def slug(self) -> str:
         return str(self.raw.get("slug", "custom"))
 
-    def token(self, skin: str, role: str) -> str:
-        return str(self.raw[skin][role])
+    @property
+    def colors(self) -> dict[str, Any]:
+        return dict(self.raw["colors"])
 
-    def solid(self, skin: str, role: str, alpha: float | None = None, over: str = "paper") -> str:
-        """A token as opaque hex for one skin, composited over the `over` token."""
-        bg = self.raw[skin][over]
+    def token(self, role: str) -> str:
+        return str(self.raw["colors"][role])
+
+    def solid(self, role: str, alpha: float | None = None, over: str = "paper") -> str:
+        """A token as opaque hex, composited over the `over` token."""
+        tokens = self.raw["colors"]
+        bg = tokens[over]
         if color.parse(bg)[1] < 1.0:
-            bg = color.composite(bg, self.raw[skin]["paper"])
-        return color.composite(self.raw[skin][role], bg, alpha)
+            bg = color.composite(bg, tokens["paper"])
+        return color.composite(tokens[role], bg, alpha)
 
     def c(self, role: str, alpha: float | None = None, over: str = "paper") -> str:
-        """A draw.io colour: `light-dark(light,dark)` when adaptive, else the primary skin's plain hex."""
-        light = self.solid("light", role, alpha, over)
-        dark = self.solid("dark", role, alpha, over)
-        if not self.adaptive:
-            return dark if self.primary == "dark" else light
-        return light if light == dark else f"light-dark({light},{dark})"
+        """A draw.io colour: the token as plain opaque hex."""
+        return self.solid(role, alpha, over)
 
     def series(self, index: int) -> str:
-        light = str(self.raw["light"]["series"][index % len(self.raw["light"]["series"])])
-        dark = str(self.raw["dark"]["series"][index % len(self.raw["dark"]["series"])])
-        if not self.adaptive:
-            return dark if self.primary == "dark" else light
-        return f"light-dark({light},{dark})"
+        series = self.raw["colors"]["series"]
+        return str(series[index % len(series)])
 
     def font(self, role: str) -> str:
         return str(self.raw["fonts"][role]["stack"])
@@ -75,40 +71,34 @@ class Theme:
     def palette(self) -> set[str]:
         """Every opaque colour a compiled diagram may legitimately use (for lint)."""
         out: set[str] = set()
-        for skin in ("light", "dark"):
-            for role in ROLES:
-                for over in ("paper", "paper2"):
-                    for a in (
-                        None,
-                        0.02,
-                        0.03,
-                        0.04,
-                        0.05,
-                        0.08,
-                        0.10,
-                        0.12,
-                        0.20,
-                        0.30,
-                        0.40,
-                        0.50,
-                        0.80,
-                        0.85,
-                    ):
-                        out.add(self.solid(skin, role, a, over).lower())
-            for s in self.raw[skin].get("series", []):
-                out.add(color.composite(s, self.solid(skin, "paper")).lower())
+        alphas = (None, 0.02, 0.03, 0.04, 0.05, 0.08, 0.10, 0.12, 0.20, 0.30, 0.40, 0.50, 0.80, 0.85)
+        for role in ROLES:
+            for over in ("paper", "paper2"):
+                for a in alphas:
+                    out.add(self.solid(role, a, over).lower())
+        for s in self.raw["colors"].get("series", []):
+            out.add(color.composite(s, self.solid("paper")).lower())
         out.update({"#ffffff", "none"})
         return out
 
 
-def load_theme(path: Path | None = None, *, adaptive: bool = True, primary: str = "light") -> Theme:
+def normalize(raw: dict[str, Any]) -> dict[str, Any]:
+    """Accept the pre-0.1 two-skin layout (`light` + `dark`): keep the light skin as `colors`."""
+    if "colors" not in raw and isinstance(raw.get("light"), dict):
+        raw["colors"] = raw["light"]
+    raw.pop("light", None)
+    raw.pop("dark", None)
+    return raw
+
+
+def load_theme(path: Path | None = None) -> Theme:
     p = path or (THEMES_DIR / "default.json")
-    raw = json.loads(p.read_text(encoding="utf-8"))
-    missing = [r for r in ROLES if r not in raw.get("light", {}) or r not in raw.get("dark", {})]
+    raw = normalize(json.loads(p.read_text(encoding="utf-8")))
+    tokens = raw.setdefault("colors", {})
+    missing = [r for r in ROLES if r not in tokens]
     if missing:
         default = json.loads((THEMES_DIR / "default.json").read_text(encoding="utf-8"))
-        for skin in ("light", "dark"):
-            for r in missing:
-                raw.setdefault(skin, {}).setdefault(r, default[skin][r])
+        for r in missing:
+            tokens[r] = default["colors"][r]
         raw["_backfilled"] = missing
-    return Theme(raw=raw, adaptive=adaptive, primary=primary)
+    return Theme(raw=raw)

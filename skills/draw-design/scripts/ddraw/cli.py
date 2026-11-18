@@ -52,7 +52,6 @@ def cmd_build(a: argparse.Namespace) -> int:
         project=project,
         theme_path=Path(a.theme) if a.theme else None,
         profile=a.profile,
-        adaptive=not a.no_adaptive,
         run_lint=not a.no_lint,
     )
     out = (
@@ -143,7 +142,6 @@ def cmd_export(a: argparse.Namespace) -> int:
         page=a.page,
         all_pages=a.all_pages,
         transparent=not a.opaque,
-        theme=a.theme,
     )
     if a.json:
         print(json.dumps({"status": "ok", "output": str(out)}))
@@ -155,7 +153,7 @@ def cmd_export(a: argparse.Namespace) -> int:
 def cmd_preview(a: argparse.Namespace) -> int:
     from ddraw.export.drawio_cli import preview
 
-    out = preview(Path(a.file), a.page, a.theme)
+    out = preview(Path(a.file), a.page)
     print(str(out))
     return EXIT_OK
 
@@ -186,8 +184,8 @@ def cmd_theme(a: argparse.Namespace) -> int:
     if a.action == "check":
         findings = check(theme)
         if not a.json:
-            for skin, role, ratio in report(theme):
-                _err(f"{skin:5} {role:7} {ratio:5.2f}:1")
+            for role, ratio in report(theme):
+                _err(f"{role:7} {ratio:5.2f}:1")
         return _report(findings, a.json)
     print(json.dumps(theme.raw, indent=2))
     return EXIT_OK
@@ -296,7 +294,6 @@ def parser() -> argparse.ArgumentParser:
     b.add_argument("--profile")
     b.add_argument("--theme", help="path to a theme JSON file")
     b.add_argument("--project", help="project root for marker/profile resolution (default: spec directory)")
-    b.add_argument("--no-adaptive", action="store_true", help="plain colours instead of light-dark()")
     b.add_argument("--no-lint", action="store_true")
     b.add_argument("--force", action="store_true", help="write the file even when lint reports errors")
     b.add_argument("--strict", action="store_true")
@@ -341,14 +338,12 @@ def parser() -> argparse.ArgumentParser:
     e.add_argument("--page", type=int, help="1-based page index")
     e.add_argument("--all-pages", action="store_true")
     e.add_argument("--opaque", action="store_true", help="keep the background (no -t)")
-    e.add_argument("--theme", choices=["light", "dark"])
     e.add_argument("--json", action="store_true")
     e.set_defaults(fn=cmd_export)
 
     pv = sub.add_parser("preview", help="render a temporary PNG for visual review; prints its path")
     pv.add_argument("file")
     pv.add_argument("--page", type=int)
-    pv.add_argument("--theme", choices=["light", "dark"])
     pv.set_defaults(fn=cmd_preview)
 
     d = sub.add_parser("doctor", help="environment diagnostics")

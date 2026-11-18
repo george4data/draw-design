@@ -85,7 +85,7 @@ Edge `kind`: `default` (internal call), `accent` (the headline path), `link` (HT
 
 | User asks | Do | Reference |
 |---|---|---|
-| "export as PNG / SVG / PDF", "editable PNG/SVG for the README" | `ddraw export <file>.drawio --format png\|svg\|pdf\|drawio.png\|drawio.svg [--scale 2] [--theme dark]`. **Only when asked.** | [export.md](references/export.md) |
+| "export as PNG / SVG / PDF", "editable PNG/SVG for the README" | `ddraw export <file>.drawio --format png\|svg\|pdf\|drawio.png\|drawio.svg [--scale 2]`. **Only when asked.** | [export.md](references/export.md) |
 | "check / lint this diagram" (any .drawio, including hand-made ones) | `ddraw lint <file>.drawio [--json]` and explain the findings | [lint.md](references/lint.md) |
 | "check my setup", "why doesn't export work" | `ddraw doctor` | [doctor.md](references/doctor.md) |
 | "use our brand colours", "make a profile for client X", "switch to the acme theme" | `ddraw profile new/use/list/show` with the user's colours; check contrast | [profiles.md](references/profiles.md) |

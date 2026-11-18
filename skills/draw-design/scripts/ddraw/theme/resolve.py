@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from ddraw.paths import THEMES_DIR, profiles_dir
+from ddraw.theme.model import normalize
 
 SLUG = re.compile(r"^[a-z0-9][a-z0-9-]{0,63}$")
 MARKER = re.compile(r"^profile:[ \t]*([^\s]+)[ \t]*\n?$")
@@ -67,11 +68,11 @@ def read_marker(root: Path) -> tuple[str, str]:
 
 def _is_default(path: Path) -> bool:
     try:
-        cur = json.loads(path.read_text(encoding="utf-8"))
+        cur = normalize(json.loads(path.read_text(encoding="utf-8")))
         default = json.loads((THEMES_DIR / "default.json").read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return False
-    keys = ("light", "dark", "fonts")
+    keys = ("colors", "fonts")
     return all(cur.get(k) == default.get(k) for k in keys)
 
 

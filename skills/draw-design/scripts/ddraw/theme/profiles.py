@@ -10,7 +10,7 @@ from typing import Any
 from ddraw.errors import DDError, Finding
 from ddraw.paths import THEMES_DIR, profiles_dir
 from ddraw.theme.contrast import check
-from ddraw.theme.model import ROLES, load_theme
+from ddraw.theme.model import ROLES, load_theme, normalize
 from ddraw.theme.resolve import MARKER_FILE, SLUG, find_project_root
 
 ACTIVE = THEMES_DIR / "active.json"
@@ -45,22 +45,20 @@ def _read(path: Path) -> dict[str, Any]:
 
 
 def _check_structure(data: dict[str, Any], where: str) -> list[Finding]:
-    out = []
-    for skin in ("light", "dark"):
-        if not isinstance(data.get(skin), dict):
-            out.append(Finding("PROFILE-003", f"{where}: missing {skin!r} token table"))
-            continue
-        missing = [r for r in ROLES if r not in data[skin]]
-        if missing:
-            out.append(
-                Finding(
-                    "PROFILE-003",
-                    f"{where}: {skin} is missing roles {', '.join(missing)}",
-                    severity="warn",
-                    fix="missing roles are backfilled from the default theme",
-                )
+    tokens = data.get("colors")
+    if not isinstance(tokens, dict):
+        return [Finding("PROFILE-003", f"{where}: missing 'colors' token table")]
+    missing = [r for r in ROLES if r not in tokens]
+    if missing:
+        return [
+            Finding(
+                "PROFILE-003",
+                f"{where}: colors is missing roles {', '.join(missing)}",
+                severity="warn",
+                fix="missing roles are backfilled from the default theme",
             )
-    return out
+        ]
+    return []
 
 
 def create(
@@ -86,7 +84,7 @@ def create(
                 )
             ]
         )
-    data = _read(source or THEMES_DIR / "default.json")
+    data = normalize(_read(source or THEMES_DIR / "default.json"))
     data.pop("_backfilled", None)
     findings = _check_structure(data, str(source or "default theme"))
     today = date.today().isoformat()
@@ -141,8 +139,7 @@ def show(slug: str) -> dict[str, Any]:
     return {
         "profile": data.get("profile", {}),
         "path": str(p),
-        "light": {r: theme.raw["light"][r] for r in ("paper", "ink", "muted", "accent", "link")},
-        "dark": {r: theme.raw["dark"][r] for r in ("paper", "ink", "muted", "accent", "link")},
+        "colors": {r: theme.token(r) for r in ("paper", "ink", "muted", "accent", "link")},
         "fonts": {k: v.get("family") for k, v in theme.raw["fonts"].items()},
         "contrast": [f.to_dict() for f in check(theme)],
     }

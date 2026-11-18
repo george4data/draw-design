@@ -49,16 +49,19 @@ def test_output_structure() -> None:
     assert last_edge < first_node
 
 
-def test_no_adaptive_emits_plain_hex() -> None:
-    xml = build(example("architecture"), adaptive=False).xml
+def test_emits_plain_light_colours_only() -> None:
+    xml = build(example("architecture")).xml
     assert "light-dark(" not in xml
+    assert 'background="#f5f5f5" adaptiveColors="none"' in xml
 
 
-def test_dark_variant_is_a_fixed_dark_rendering() -> None:
+def test_dark_variant_is_rejected() -> None:
+    from ddraw.errors import DDError
+
     data = example("architecture")
     data["variant"] = "dark"
-    xml = build(data).xml
-    assert 'background="#2d3142"' in xml and "light-dark(" not in xml
+    with pytest.raises(DDError):
+        build(data)
 
 
 def test_over_capacity_reports_layout_error() -> None:

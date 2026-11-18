@@ -217,12 +217,12 @@ Legend for **Disposition**: **Keep** = carry over semantically unchanged; **Adap
 
 | # | Reference feature | How it works | Disposition | draw.io adaptation | Pri |
 |---|---|---|---|---|---|
-| F12 | Semantic tokens | `style-guide.md` tables: paper, paper-2, ink, ink-strong, muted, soft, rule, rule-solid, accent, accent-tint, link (+ dark) | **Adapt** | Machine-readable `theme.json` (§10.1) is the source of truth. Human-readable `style-guide.md` is generated from it | P0 |
+| F12 | Semantic tokens | `style-guide.md` tables: paper, paper-2, ink, ink-strong, muted, soft, rule, rule-solid, accent, accent-tint, link (+ dark) | **Adapt** | Machine-readable `theme.json` (§10.1) is the source of truth, with one light palette (dark dropped, ADR 0011). Human-readable `style-guide.md` is generated from it | P0 |
 | F13 | Node treatments | focal, backend, store, external, input, optional, security → fill/stroke recipes | **Keep** | Treatment → draw.io style string fragments (§10.3) | P0 |
 | F14 | Typography roles | title (serif), node-name (sans 600), sublabel (mono), eyebrow, arrow-label, callout (italic serif) | **Adapt** | Roles → `fontFamily`, `fontSize`, `fontStyle` bitmask, `fontColor`; optional `fontSource` for web fonts (§10.4) | P0 |
 | F15 | Type ramp per size class | standard / presentation / print sizes | **Keep** | Same numbers, applied by the compiler | P0 |
 | F16 | Contrast contract (WCAG) | `verify-contrast.py` checks each token for each role | **Keep** | `ddraw theme check` (LR-T001…T004) | P0 |
-| F17 | Light / dark variants | Separate templates | **Adapt** | Compile twice (light, dark) or emit draw.io *adaptive* colours where supported (§10.5, OQ-04) | P0 (light), P1 (dark) |
+| F17 | Light / dark variants | Separate templates | **Drop** (ADR 0011) | Light only. Dark renderings did not look right in draw.io and doubled the theme surface; files pin `adaptiveColors="none"` so draw.io's dark UI shows them as drawn | — |
 | F18 | Series palette (charts) | 5 desaturated series colours; accent = focal series | **Keep** | Same tokens in `theme.json` | P1 |
 | F19 | Terminal skin | Fixed CLI-chrome palette | **Adapt** | Theme preset `terminal` + window-chrome frame cells | P3 |
 | F20 | Font source web / system | Google Fonts link vs system stacks; `--offline` check | **Adapt** | `web` → draw.io `fontSource` style with Google Fonts URL; `system` → plain family names. Export notes font availability (§14.4) | P1 |
@@ -250,7 +250,7 @@ Legend for **Disposition**: **Keep** = carry over semantically unchanged; **Adap
 |---|---|---|---|---|
 | F33 | Single self-contained HTML | **Drop** (replaced) | Primary artifact is `.drawio` (uncompressed XML). HTML output is out of scope (NG-01) | — |
 | F34 | Size presets (doc-inline 960×600 … print-a3, fit) | **Keep** | Preset → page frame size (`pageWidth/pageHeight`) and content area; `fit` derives from content (§9.4) | P0 |
-| F35 | Variants: minimal light, minimal dark, full editorial, consultant quadrant | **Adapt** | `variant` field; full editorial = page with title block and summary cards | P1 |
+| F35 | Variants: minimal light, minimal dark, full editorial, consultant quadrant | **Adapt** (no dark, ADR 0011) | `variant` field; full editorial = page with title block and summary cards | P1 |
 | F36 | Mobile `min-width` / overflow rules | **Drop** | Not applicable to draw.io pages | — |
 | F37 | Export SVG (standalone, namespaced defs, a11y kept) | **Adapt** | draw.io CLI `-x -f svg` + post-process: inject `<title>/<desc>`, `role`, optional `--embed-diagram` for editable SVG (§14) | P0 |
 | F38 | Export PNG via Playwright (transparent, scale 1–4) | **Adapt** | draw.io CLI `-f png -s <scale> -t` (transparent) with the same 1–4 scale rule; editable PNG via `-e` (§14) | P0 |
@@ -303,7 +303,7 @@ Legend for **Disposition**: **Keep** = carry over semantically unchanged; **Adap
 | # | Capability | Value | Pri |
 |---|---|---|---|
 | N01 | **Editable output** with semantic metadata (`dd-role`, `dd-id` on every cell via `UserObject`) | Users fine-tune in draw.io. Agents can re-read intent later | P0 |
-| N02 | **Multi-page files** (overview + details, light + dark, step deck) with page links | Replaces the reference's "split into N files" | P1 |
+| N02 | **Multi-page files** (overview + details, step deck) with page links | Replaces the reference's "split into N files" | P1 |
 | N03 | **Restyle in place** an existing `.drawio` to the brand | Huge installed base of ugly draw.io files | P0 |
 | N04 | **Round-trip sync**: read a hand-edited `.drawio` back into the spec (pinned positions) | Human + agent co-editing | P2 |
 | N05 | **Brand library export** (`.xml` mxlibrary) | Teams stay on-brand manually | P2 |
@@ -664,7 +664,7 @@ draw-design/
 │       │   ├── primitive-annotation.md · primitive-icons.md · primitive-sketchy.md
 │       │   └── type-<slug>.md      # one per visual type (§12)
 │       ├── themes/
-│       │   ├── default.json        # shipped default skin (light + dark)
+│       │   ├── default.json        # shipped default theme (one light palette)
 │       │   └── terminal.json       # P3
 │       ├── data/
 │       │   ├── budgets.json        # universal + per-type budgets
@@ -807,7 +807,7 @@ classDiagram
 | `ddVersion` | int | ✔ | — | MUST be `1` in v1 |
 | `type` | enum | ✔ | — | A slug from `data/types.json` with status `shipped`. Unknown → `SPEC-010` listing shipped types |
 | `pattern` | enum | — | null | One of 9 semantic-pattern slugs (§9.6). Pattern validation runs only when set |
-| `variant` | enum | — | `light` | `light` · `dark` · `full` · `both` (light + dark pages) · `consultant` (quadrant only) · `terminal` (P3) |
+| `variant` | enum | — | — | `full` · `consultant` (quadrant only) · `terminal` (P3). No `light`/`dark`/`both` (ADR 0011) |
 | `title` | string | ✔ | — | 1–60 chars; becomes the title cell and the page name |
 | `description` | string | ✔ | — | One sentence describing *content*, not geometry; 10–200 chars. Used for export a11y |
 | `eyebrow` | string | — | type name, uppercase | ≤ 32 chars |
@@ -989,7 +989,7 @@ A **bundle** spec produces one `.drawio` with several pages:
 { "ddVersion": 1, "bundle": true, "title": "Platform", "pages": [ { "...": "spec A" }, { "...": "spec B" } ] }
 ```
 
-- **FR-009** Each page is compiled independently with the same theme. Page names = page titles (unique, ≤ 60 chars). `variant: "both"` on a non-bundle spec is sugar for a two-page bundle (light, dark).
+- **FR-009** Each page is compiled independently with the same theme. Page names = page titles (unique, ≤ 60 chars).
 - **FR-009a** Overview → detail navigation: a node with `meta.page = "<page title>"` becomes a draw.io page link (`link="data:page/id,<diagram-id>"`) to that page.
 
 ---
@@ -1001,8 +1001,8 @@ The theme (§15.1) is bound to draw.io style strings at compile time. Style synt
 ### 10.1 Colour binding
 
 - **FR-020** Every colour is resolved from a token to an opaque `#rrggbb`. Translucent tokens (`rule`, `accentTint`, `ink @ 0.05`, …) are composited over the surface they sit on (usually `paper`, `paper2` inside zones) (FR-080). Where the translucency itself is the point (Venn overlaps, heatmap ramps), emit the full colour + `fillOpacity`/`strokeOpacity` (0–100).
-- **FR-021** **Dark mode** (resolves OQ-04): draw.io supports `light-dark(<light>,<dark>)` as a colour value and an `adaptiveColors` attribute on `mxGraphModel` (`auto|simple|none|default`). The compiler emits **every colour as `light-dark(<light token>,<dark token>)`** from the theme's two skins, and sets `adaptiveColors="none"` so draw.io never auto-inverts brand colours. One file then renders the brand's light skin normally and the brand's dark skin when the viewer or exporter uses dark (`drawio -x --theme dark`). `variant: dark` swaps the order (dark skin as the primary rendering) and sets the model `background`. `--no-adaptive` emits plain hex for old renderers. *Verify in T-1.3 the minimum draw.io version that renders `light-dark()`; if a target renderer lacks it, default to `--no-adaptive` and compile dark as a separate page.*
-- **FR-022** Page background: `mxGraphModel background="<paper>"` (as `light-dark`). The frame cell has `fillColor=none` unless `--frame`.
+- **FR-021** **No dark mode** (ADR 0011, supersedes ADR 0010 items 4–5). The compiler emits plain opaque hex from the theme's single `colors` table and sets `adaptiveColors="none"` on `mxGraphModel`, so draw.io's dark UI never recolours the diagram. Export always passes `--theme light`. Lint still parses `light-dark()` values in foreign files (it checks both halves).
+- **FR-022** Page background: `mxGraphModel background="<paper>"`. The frame cell has `fillColor=none` unless `--frame`.
 
 ### 10.2 Cell anatomy
 
@@ -1034,7 +1034,7 @@ flowchart LR
 | Treatment | Base style | Fill | Stroke | Extra |
 |---|---|---|---|---|
 | `focal` | `rounded=1;arcSize=<r>;absoluteArcSize=1;whiteSpace=wrap;html=1;` | `accentTint` (composited) | `accent`, `strokeWidth=1.2` | name `fontColor=ink`; ≤2 per diagram |
-| `backend` | same | `#ffffff` light / `ink@0.05` dark | `ink`, `strokeWidth=1` | — |
+| `backend` | same | `nodeFill` (`#ffffff`) | `ink`, `strokeWidth=1` | — |
 | `store` | same | `ink@0.05` | `muted` | `shape=cylinder3` only on types that ask for a barrel (default: box, per reference) |
 | `external` | same | `ink@0.03` | `ink@0.30` | — |
 | `input` | same | `muted@0.10` | `soft` | — |
@@ -1072,23 +1072,22 @@ Arrowhead size approximates the reference's 8×6 marker. Corner rounding on edge
 
 ### 10.5 Variants
 
+There is no light/dark variant: diagrams have one light palette (ADR 0011). With no `variant`, the plain diagram is drawn.
+
 | Variant | Effect |
 |---|---|
-| `light` (default) | light skin primary; adaptive dark via `light-dark()` |
-| `dark` | dark skin primary; page background = dark paper |
-| `both` | two-page bundle: light page, dark page (`adaptiveColors="none"`, plain hex) for renderers without `light-dark` |
 | `full` | page frame grows: header band (eyebrow, title, subtitle), figure, 2–3 summary cards (varied widths, e.g. 1.1fr/1fr/0.9fr mapped to 4px-rounded px), footer colophon |
 | `consultant` | quadrant only: 2×2 scenario matrix |
 | `terminal` | P3: terminal theme + window chrome |
 
 ### 10.6 Full editorial variant
 
-- **FR-028** Summary cards are rounded rectangles (`#ffffff` light / `paper2` dark, `rule` 1px, radius 6, no shadow) with an eyebrow, a card dot (7px ellipse in ink/muted/accent/link/soft) and ≤4 bullet lines. Card content comes from the spec's optional `summary[]` (`{eyebrow, title, items[]}`, ≤3 cards).
+- **FR-028** Summary cards are rounded rectangles (`nodeFill`, `rule` 1px, radius 6, no shadow) with an eyebrow, a card dot (7px ellipse in ink/muted/accent/link/soft) and ≤4 bullet lines. Card content comes from the spec's optional `summary[]` (`{eyebrow, title, items[]}`, ≤3 cards).
 
 ### 10.7 Callouts and sketch
 
 - **FR-029** Callout = text cell (italic serif 14) in a margin + leader edge `curved=1;dashed=1;dashPattern=4 3;endArrow=oval;endSize=4;endFill=1;strokeColor=<ink@0.40>;` with one waypoint making a gentle curve, ending on the target's border (the "landing dot").
-- **FR-029a** `sketch: true` adds `sketch=1;curveFitting=1;jiggle=2;` to **shape** styles only. Text keeps the theme fonts (the reference rule "filter shapes, not text"). The draw.io sketch look's default handwriting font is not applied. Lint warns on `sketch` + `variant: dark` (the reference says wobble reads as an artifact on dark).
+- **FR-029a** `sketch: true` adds `sketch=1;curveFitting=1;jiggle=2;` to **shape** styles only. Text keeps the theme fonts (the reference rule "filter shapes, not text"). The draw.io sketch look's default handwriting font is not applied.
 
 ### 10.8 Icons and vendor shape libraries (AWS, GCP, Azure, Kubernetes, …)
 
@@ -1553,7 +1552,7 @@ Unchanged from the reference (`engineer` / `mixed` / `executive` governs naming,
 | `drawio.png` | `-x -f png -e -s <scale> -o <name>.drawio.png <in>` | editable PNG (diagram embedded) |
 | `drawio.svg` | `-x -f svg -e -o <name>.drawio.svg <in>` + post-process | editable in the VS Code draw.io extension |
 | `jpg` | `-x -f jpg -q 90 …` | not recommended (no transparency) |
-| dark rendering | add `--theme dark` | uses the `light-dark()` dark values (FR-021) |
+| every format | always adds `--theme light` | pins the light rendering so a dark-mode draw.io cannot invert colours (ADR 0011) |
 
 Flags facts (draw.io Desktop v32.7.4, `src/main/args.js`): `-p/--page-index` is **1-based**; `-o` with a `.drawio` extension is not a recognized format, so XML export needs `-f xml` (and `-u` for uncompressed); `--size diagram|page` controls the crop for png/jpg/svg; unknown flags are silently ignored, so `export/drawio_cli.py` MUST validate its own flags against a pinned allowlist per supported CLI version.
 
@@ -1604,17 +1603,11 @@ draw.io Desktop's CLI can lay out a file (`-x -f xml --layout <preset|JSON> -u`,
     "mono":     { "family": "Geist Mono", "weight": 400, "fallback": "Menlo, Consolas, monospace", "google": "Geist+Mono:wght@400;500;600" },
     "callout":  { "family": "Instrument Serif", "italic": true }
   },
-  "light": {
+  "colors": {
     "paper": "#f5f5f5", "paper2": "#ececec", "ink": "#2d3142", "inkStrong": "#111111",
     "muted": "#4f5d75", "soft": "#5a6580", "rule": "rgba(45,49,66,0.12)", "ruleSolid": "#bfc0c0",
-    "accent": "#bf4520", "accentTint": "rgba(191,69,32,0.08)", "link": "#2e5aa8",
+    "accent": "#bf4520", "accentTint": "rgba(191,69,32,0.08)", "link": "#2e5aa8", "nodeFill": "#ffffff",
     "series": ["#7c8f6f", "#5e7a9b", "#b8915a", "#9c6b50", "#6e6479"]
-  },
-  "dark": {
-    "paper": "#2d3142", "paper2": "#393e53", "ink": "#f5f5f5", "inkStrong": "#111111",
-    "muted": "#bfc0c0", "soft": "#949eb2", "rule": "rgba(245,245,245,0.12)", "ruleSolid": "rgba(191,192,192,0.25)",
-    "accent": "#f08a59", "accentTint": "rgba(240,138,89,0.10)", "link": "#739fdf",
-    "series": ["#9caf8f", "#82a0c0", "#d3ad7a", "#b88670", "#8d8298"]
   },
   "stroke": { "thin": 0.8, "default": 1, "strong": 1.2 },
   "radius": { "sm": 4, "md": 6, "lg": 8 }
@@ -1622,7 +1615,7 @@ draw.io Desktop's CLI can lay out a file (`-x -f xml --layout <preset|JSON> -u`,
 ```
 
 - **FR-080** draw.io styles do not accept `rgba()`. Translucent tokens are **composited over `paper`** at bind time into opaque hex, or emitted as hex plus `fillOpacity`/`strokeOpacity` (0–100) where layering matters. The contrast check uses composited values (as the reference does).
-- **FR-081** `ddraw theme check <theme.json>` enforces the contrast contract: text roles (`ink`, `muted`, `soft`, `link`, `accent`) ≥ 4.5:1 on `paper` in both skins; essential marks ≥ 3:1; `inkStrong` on accent fill ≥ 4.5:1. Exit 1 on failure with suggested adjusted values (darken or lighten in HSL, keeping hue).
+- **FR-081** `ddraw theme check <theme.json>` enforces the contrast contract: text roles (`ink`, `muted`, `soft`, `link`, `accent`) ≥ 4.5:1 on `paper`; essential marks ≥ 3:1; `inkStrong` on accent fill ≥ 4.5:1. Exit 1 on failure with suggested adjusted values (darken in HSL, keeping hue).
 
 ### 15.2 Resolution before every generation
 
@@ -2068,7 +2061,7 @@ Generated between `<!-- BEGIN GENERATED:<name> -->` / `<!-- END GENERATED:<name>
 
 ### 20.5 Gallery
 
-`gallery/<slug>.drawio` (+ `-dark`, `-full` variants) compiled from `examples/`. CI renders `gallery/png/<slug>.png`. `gallery/index.drawio` is a bundle with one page per type, generated, for browsing inside draw.io.
+`gallery/<slug>.drawio` (+ `-full` variant when built) compiled from `examples/`. CI renders `gallery/png/<slug>.png`. `gallery/index.drawio` is a bundle with one page per type, generated, for browsing inside draw.io.
 
 ### 20.6 Agent evals
 
@@ -2159,7 +2152,7 @@ flowchart LR
 flowchart LR
     M0["M0 Foundations"] --> M1["M1 Core compiler<br/>+ Wave-1 engines"]
     M1 --> M2["M2 Skill, brand, import, export<br/>→ release 0.1 (MVP)"]
-    M2 --> M3["M3 Wave 2 + dark/full + Mermaid + URL onboarding<br/>→ release 1.0"]
+    M2 --> M3["M3 Wave 2 + full variant + Mermaid + URL onboarding<br/>→ release 1.0"]
     M3 --> M4["M4 Wave 3 + round-trip + library + PlantUML/Excalidraw<br/>→ release 1.1"]
     M4 --> M5["M5 Stencil engine + Wave 4<br/>→ release 1.2"]
 ```
@@ -2169,7 +2162,7 @@ flowchart LR
 | M0 | Repo skeleton, manifests validate, CI green on empty suites, ADRs 0001–0009, AGENTS.md |
 | M1 | `ddraw build` compiles all Wave-1 example specs; lint core rules implemented; goldens; fuzz green |
 | M2 | Installed via both marketplaces; first-run gate; profiles; restyle import; export PNG/SVG/PDF; doctor; shape catalog + vendor icons (AWS/GCP/Azure/K8s); SM-3 met → **0.1.0** |
-| M3 | 24 shipped types; dark/full/both variants; Mermaid import; redraw import; URL/folder/drawio onboarding; visual self-review; evals SM-1 ≥ 90% → **1.0.0** |
+| M3 | 24 shipped types; full variant; Mermaid import; redraw import; URL/folder/drawio onboarding; visual self-review; evals SM-1 ≥ 90% → **1.0.0** |
 | M4 | 46 types; `sync` round-trip; brand library; PlantUML/Excalidraw; registry; layers/motion-lite → **1.1.0** |
 | M5 | S3 stencil engine; radar, sankey, ridgeline, streamgraph, exploded, axonometric-plan → **1.2.0** (50 types) |
 
@@ -2189,7 +2182,7 @@ flowchart LR
 |---|---|---|---|---|---|
 | T-1.1 | Spec model, JSON Schema (`spec.schema.json` core + Wave-1 blocks), stdlib schema validator, semantic checks, error pointers + did-you-mean | T-0.5 | §9 | `spec/`, `schemas/spec.schema.json` | Worked examples A/B validate; 30 invalid fixtures each produce the expected SPEC-code and pointer |
 | T-1.2 | Theme model + `themes/default.json` + compositing (rgba→hex/opacity) + contrast checker + `ddraw theme check` | T-0.5 | §10, §15.1, FR-080/081 | `theme/model.py`, `theme/contrast.py`, `themes/` | Default theme passes; reference's published ratios reproduced ±0.01 |
-| T-1.3 | Style emitter: treatments, edge kinds, text roles → draw.io style strings (§10.3 tables), deterministic key order | T-1.2 | §10, §B.2 | `emit/styles.py` | Snapshot tests for every treatment × light/dark |
+| T-1.3 | Style emitter: treatments, edge kinds, text roles → draw.io style strings (§10.3 tables), deterministic key order | T-1.2 | §10, §B.2 | `emit/styles.py` | Snapshot tests for every treatment |
 | T-1.4 | mxGraph XML writer: mxfile/diagram/model/root, cells 0/1, UserObject with `dd-*` attrs, layers (background, diagram, notes), pages, deterministic ids, label HTML escaping, optional compression | T-1.3 | §10.2, §B.1 | `emit/mxgraph.py`, `emit/userobject.py`, `emit/compress.py` | Output opens in draw.io (render job); every golden validates against the vendored `mxfile.xsd` (FR-121); round-trip parse equals IR; byte-stable |
 | T-1.5 | Text measurement + wrapping (width budget, CJK 1em, letter-spacing) | T-0.5 | §11.6 | `text/` | Table tests incl. reference examples (`주문 v2.1`, `Шкаф ODF-2`) |
 | T-1.6 | Grid + frame + legend + title block + callouts (generic page composition) | T-1.4, T-1.5 | §9.4, §10.6, §11.1 | `layout/grid.py`, `layout/page.py` | Legend auto-derivation tests; all content inside safe area |
@@ -2227,7 +2220,7 @@ flowchart LR
 | T-3.1 | Engines: axes (linear/band scales, ticks, gridlines) and cell grid | M1 | bar + heatmap examples lint-clean |
 | T-3.2 | Engine: time scale (day/week/month/quarter, honest spacing, axis break) | M1 | timeline + gantt examples lint-clean |
 | T-3.3…T-3.16 | **Wave-2 types** (14): deployment, dependency, uml-class, db-schema, timeline, gantt, kanban, quadrant (+ consultant), pyramid, venn, steps, bar (+ grouped/stacked/dumbbell), heatmap, process. Same per-type contract as T-1.14 | Same as T-1.14 |
-| T-3.17 | Variants: dark, `both`, full editorial (title block + summary cards with varied widths) | §10.5–10.6; every shipped example compiles in all variants lint-clean |
+| T-3.17 | Variants: full editorial (title block + summary cards with varied widths) | §10.5–10.6; every shipped example compiles in all variants lint-clean |
 | T-3.18 | Mermaid importer (flowchart, sequence, state, ER) + `/draw-design:import-mermaid` + reference | adversarial fixtures safe; worked example parity with reference |
 | T-3.19 | Redraw mode: skeleton spec generation, degrade-ladder helper (`ddraw digest --suggest-cuts`), bundle split for >24 nodes, ledger layer | FR-071/074/075 tests |
 | T-3.20 | Onboarding (a) URL with trust gate, (c) folder, (g) from-drawio, fidelity receipt | FR-082/083; trust prompt text present verbatim |
@@ -2284,7 +2277,7 @@ Built and verified in the first development session. Agents picking up work shou
 |---|---|---|
 | M0 foundations (T-0.1–T-0.5) | **done** | Manifests (Claude, Codex), CI workflow, ADRs 0001–0010, Makefile, registry with 50 types |
 | Spec, schema, validator (T-1.1) | **done** | Stdlib JSON Schema subset, JSON-pointer errors, did-you-mean, per-type label rules |
-| Theme, contrast, styles, XML writer (T-1.2–T-1.4) | **done** | `light-dark()` colours (ADR 0010); deterministic, uncompressed output |
+| Theme, contrast, styles, XML writer (T-1.2–T-1.4) | **done** | plain hex, single light palette (ADR 0011); deterministic, uncompressed output |
 | Text measure, page composition, legend (T-1.5, T-1.6) | **done** | Legend rows wrap; `fit` preset |
 | Router (T-1.7) | **done** | Fan ports, A* with late-bend preference, rip-up and reroute, bus routing, self-loops; 120-seed fuzz green |
 | Lint core (T-1.8) | **mostly done** | LR-S001–S007, G001/G003/G004, B001–B004, C001–C007, T001/T002/T005, L001, X001/X002. Not yet: G002, T003, T004, T006, L002, L003, X003, LR-I* (icons) |
@@ -2299,7 +2292,7 @@ Built and verified in the first development session. Agents picking up work shou
 | Commands | **done:** doctor, export, check, profile, import-drawio | onboard command not built |
 | Shape catalog and icons (T-2.11, T-2.12, T-3.25, T-4.28) | **not started** | |
 | Redraw import, Mermaid and PlantUML (T-3.18, T-3.19, T-4.25) | **not started** | |
-| Variants: full editorial, sketch (T-3.17, T-4.29) | **partial** | light and dark done; full and sketch flag are emitted but the full layout is not built |
+| Variants: full editorial, sketch (T-3.17, T-4.29) | **partial** | dark removed (ADR 0011); full and sketch flag are emitted but the full layout is not built |
 | Evals (T-3.23) | **not started** | |
 
 Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), shape catalog and icons (T-2.11, T-2.12), redraw import with Mermaid (T-3.18, T-3.19), then Wave 2 types.
@@ -2315,12 +2308,12 @@ Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), shape
 | R-05 | LLM writes invalid specs repeatedly | Med | Med | Pointer-based errors with did-you-mean; `ddraw new <type>` scaffolds; examples in each type reference; ≤3 iteration cap |
 | R-06 | Scope: 50 types is large | High | Med | Waves; per-type registration files for parallel agents; v1.0 = 24 types |
 | R-07 | S3 stencils render inconsistently or are hard to edit | Med | Med | Isolated in M5; images (S4) as fallback with a lint warning |
-| R-08 | Theme rgba semantics lost in draw.io (no rgba) | Certain | Low | Compositing at bind time (FR-080); dark variant compiled separately |
+| R-08 | Theme rgba semantics lost in draw.io (no rgba) | Certain | Low | Compositing at bind time (FR-080) |
 | R-09 | draw.io CLI unavailable in sandboxed hosts (Codex sandbox, CI) | Med | Med | Export optional; doctor explains; CI uses xvfb image |
 | R-10 | Legal: brand icons and trademark use | Low | Med | Monochrome only, attribution, user opt-in for brand icons |
 | R-11 | Trigger collision with jgraph's official `drawio` skill when both are installed (both match "draw a diagram") | High | Med | FR-120: complementary positioning; description emphasizes editorial/brand/restyle/type names; README explains when to use which; eval prompts include "both installed" cases |
 | R-12 | GPL-3.0 draw.io Desktop invoked by an MIT plugin | Low | Med | Invoke as a separate user-installed program only; never bundle, vendor or link; legal check before 1.0 |
-| R-13 | draw.io renders `light-dark()` or edge `arcSize` differently across versions | Med | Low | `--no-adaptive` fallback; minimum version pinned (OQ-02); render job tests oldest + latest |
+| R-13 | draw.io renders edge `arcSize` differently across versions | Med | Low | minimum version pinned (OQ-02); render job tests oldest + latest |
 | R-14 | Shape catalog drifts from the user's draw.io (new families like GCP 2026 render blank in older versions; renamed stencils) | Med | Med | Per-family `since`; LR-I003; doctor 4a; catalog rebuilt per release from a pinned tag with a diff review; fallback to the previous family |
 | R-15 | Vendor icon terms (some packs restrict modification, e.g. recolouring) | Med | Low | Default `iconStyle: vendor` (unmodified) for vendor ids; `mono` documented as user's choice; terms per family in `data/shapes/LICENSES.md` |
 
@@ -2333,7 +2326,7 @@ Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), shape
 | OQ-01 | Final product name (`draw-design` vs alternatives) | `draw-design` |
 | OQ-02 | Minimum supported draw.io Desktop version for export | Latest stable at M2 minus 2 majors (record in ADR) |
 | OQ-03 | Does the current Codex plugin format support bundled slash commands/prompts? | Assume no; NL routes |
-| OQ-04 | Use draw.io adaptive/dark-mode colours, or compile separate dark pages? | **Resolved (ADR 0010):** light variant = `light-dark()` pairs; dark variant = fixed dark hex. Original proposal: `light-dark()` colours + `adaptiveColors="none"` (FR-021), `both` variant for old renderers. Confirm the minimum version in T-1.3 |
+| OQ-04 | Use draw.io adaptive/dark-mode colours, or compile separate dark pages? | **Resolved, then dropped (ADR 0011):** no dark mode; plain light hex with `adaptiveColors="none"`. ADR 0010 had used `light-dark()` pairs plus a fixed dark variant. Original proposal: `light-dark()` colours + `adaptiveColors="none"` (FR-021), `both` variant for old renderers. Confirm the minimum version in T-1.3 |
 | OQ-10 | Reuse jgraph's Apache-2.0 assets (XSD, shape index, style reference) or stay self-contained? | Vendor the XSD for tests only; shape index optional for P2 icon mapping |
 | OQ-11 | Offer ELK (via the desktop CLI) as the default engine for graph types when available? | No: in-house engines stay the default for determinism; ELK is opt-in (FR-066) |
 | OQ-12 | Which non-cloud libraries to catalogue at P0 vs later (Cisco, IBM, network, BPMN, C4, mockups)? | P0: aws4, aws3d, gcp2, gcp3, azure2, kubernetes; P1: cisco19, ibm, networks2, c4; others on request |
@@ -2380,12 +2373,12 @@ flowchart TB
 ```xml
 <mxfile host="draw-design" agent="ddraw/0.1.0" compressed="false">
   <diagram id="p-checkout" name="Checkout platform">
-    <mxGraphModel grid="1" gridSize="4" page="0" pageWidth="960" pageHeight="600" adaptiveColors="none" background="light-dark(#f5f5f5,#2d3142)">
+    <mxGraphModel grid="1" gridSize="4" page="0" pageWidth="960" pageHeight="600" adaptiveColors="none" background="#f5f5f5">
       <root>
         <mxCell id="0"/>
         <mxCell id="1" parent="0"/>
         <UserObject id="dd-gw" label="&lt;span style=&quot;font-weight:600&quot;&gt;API Gateway&lt;/span&gt;" dd-role="backend" dd-id="gw" dd-type="architecture">
-          <mxCell style="rounded=1;arcSize=6;absoluteArcSize=1;whiteSpace=wrap;html=1;fillColor=light-dark(#fbeee9,#4a3a3c);strokeColor=light-dark(#bf4520,#f08a59);strokeWidth=1.2;shadow=0;" vertex="1" parent="1">
+          <mxCell style="rounded=1;arcSize=6;absoluteArcSize=1;whiteSpace=wrap;html=1;fillColor=#f1e7e4;strokeColor=#bf4520;strokeWidth=1.2;shadow=0;" vertex="1" parent="1">
             <mxGeometry x="400" y="240" width="160" height="56" as="geometry"/>
           </mxCell>
         </UserObject>
@@ -2420,7 +2413,7 @@ A stencil is `<shape name w h aspect="variable" strokewidth="inherit"><backgroun
 
 Vertex: `shape rounded arcSize absoluteArcSize whiteSpace html fillColor strokeColor strokeWidth dashed dashPattern opacity fillOpacity strokeOpacity textOpacity fontFamily fontSize fontColor fontStyle fontSource align verticalAlign labelPosition verticalLabelPosition spacing spacingTop spacingBottom spacingLeft spacingRight labelBackgroundColor labelBorderColor overflow horizontal container collapsible pointerEvents startSize swimlaneFillColor childLayout perimeter aspect image imageAspect imageWidth imageHeight connectable shadow sketch curveFitting jiggle fillStyle points portConstraint direction rotation flipH flipV size`.
 Edge: `edgeStyle elbow curved rounded orthogonalLoop jettySize jumpStyle jumpSize startArrow endArrow startFill endFill startSize endSize exitX exitY exitDx exitDy exitPerimeter entryX entryY entryDx entryDy entryPerimeter strokeColor strokeWidth dashed dashPattern labelBackgroundColor fontFamily fontSize fontColor flowAnimation html`.
-Colour values: `#rrggbb`, `none`, `light-dark(a,b)`, `inherit`. Never `rgba()` (§10.1).
+Colour values: `#rrggbb`, `none`, `inherit` (`light-dark(a,b)` exists in draw.io but is not emitted, ADR 0011). Never `rgba()` (§10.1).
 Forbidden (lint): `shadow=1`, `glass=1`, `gradientColor`, `comic=1`, `libavoidRouting` (we route ourselves), plugin and `data:action` links.
 
 ### B.3 Desktop CLI flags (v32.7.4)
@@ -2439,7 +2432,7 @@ Forbidden (lint): `shadow=1`, `glass=1`, `gradientColor`, `comic=1`, `libavoidRo
 - Shape libraries are bundled in every draw.io build. The *More Shapes* dialog only toggles sidebar visibility (a user preference stored in the editor, not in the file). A file referencing `mxgraph.aws3d.*` or `mxgraph.gcp2.*` renders regardless. Unknown shape names render as an empty/default box with no error.
 - Example vendor styles (from draw.io sidebars): AWS Lambda `shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;fillColor=#ED7100;strokeColor=#ffffff;aspect=fixed;`; AWS VPC group `shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc;strokeColor=#879196;fillColor=none;`; AWS 3D `mxgraph.aws3d.ami;aspect=fixed;fillColor=#E8CA45;…`; Azure icons are images `image=img/lib/azure2/<category>/<Name>.svg`.
 
-Sources: drawio.com docs (diagram-generation, style-reference, json-layout-specification, export, custom libraries, placeholders), jgraph/drawio `Graph.js`/`EditorUi.js`/`Sidebar-*.js`, drawio-desktop `src/main/args.js`, `electron.js`, `png-xml.js`; jgraph/drawio-mcp `shared/*`. Retrieved 2026-11-17. Items still to verify are listed as tasks in T-1.3, T-1.4 and T-2.7: `light-dark()` minimum version, edge `arcSize` behaviour, `-l` layer index base, and whether Desktop fetches web fonts.
+Sources: drawio.com docs (diagram-generation, style-reference, json-layout-specification, export, custom libraries, placeholders), jgraph/drawio `Graph.js`/`EditorUi.js`/`Sidebar-*.js`, drawio-desktop `src/main/args.js`, `electron.js`, `png-xml.js`; jgraph/drawio-mcp `shared/*`. Retrieved 2026-11-17. Items still to verify are listed as tasks in T-1.3, T-1.4 and T-2.7: edge `arcSize` behaviour, `-l` layer index base, and whether Desktop fetches web fonts.
 
 ## C. Reference-to-repo mapping (where to look in `reference/diagram-design`)
 

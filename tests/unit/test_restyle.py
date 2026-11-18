@@ -42,7 +42,7 @@ def test_restyle_fixture_keeps_geometry_and_applies_theme() -> None:
     assert "mxgraph.aws4.bucket" in report.kept
     geo = re.compile(r'<mxGeometry x="([\d.]+)" y="([\d.]+)"')
     assert geo.findall(src)[:5] == geo.findall(xml)[:5]
-    assert "shadow=1" not in xml and "#dae8fc" not in xml and "light-dark(" in xml
+    assert "shadow=1" not in xml and "#dae8fc" not in xml and "light-dark(" not in xml
     assert not [f for f in lint_text(xml) if f.code.startswith("LR-S") and f.severity == "error"]
 
 

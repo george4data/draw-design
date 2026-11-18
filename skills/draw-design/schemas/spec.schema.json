@@ -38,10 +38,7 @@
     "variant": {
       "type": "string",
       "enum": [
-        "light",
-        "dark",
         "full",
-        "both",
         "consultant",
         "terminal"
       ]

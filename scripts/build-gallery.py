@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile every example spec into gallery/<slug>.drawio (light and dark); --render also exports PNGs."""
+"""Compile every example spec into gallery/<slug>.drawio; --render also exports PNGs."""
 
 from __future__ import annotations
 
@@ -26,27 +26,23 @@ def main() -> int:
     failures = 0
     for spec_path in sorted((SKILL / "examples").glob("*.dd.json")):
         slug = spec_path.name[: -len(".dd.json")]
-        for variant in ("light", "dark"):
-            data = json.loads(spec_path.read_text(encoding="utf-8"))
-            data["variant"] = variant
-            result = build(data)
-            name = slug if variant == "light" else f"{slug}-dark"
-            target = out / f"{name}.drawio"
-            target.write_text(result.xml, encoding="utf-8")
-            errors = [f for f in result.findings if f.severity == "error"]
-            failures += bool(errors)
-            print(f"{'FAIL' if errors else 'ok  '} {target.relative_to(ROOT)}")
-            if render and cli is not None:
-                (out / "png").mkdir(exist_ok=True)
-                png = drawio_cli.export(
-                    target,
-                    "png",
-                    out / "png" / f"{name}.png",
-                    scale=2,
-                    transparent=False,
-                    cli=cli,
-                )
-                print(f"     {png.relative_to(ROOT)}")
+        result = build(json.loads(spec_path.read_text(encoding="utf-8")))
+        target = out / f"{slug}.drawio"
+        target.write_text(result.xml, encoding="utf-8")
+        errors = [f for f in result.findings if f.severity == "error"]
+        failures += bool(errors)
+        print(f"{'FAIL' if errors else 'ok  '} {target.relative_to(ROOT)}")
+        if render and cli is not None:
+            (out / "png").mkdir(exist_ok=True)
+            png = drawio_cli.export(
+                target,
+                "png",
+                out / "png" / f"{slug}.png",
+                scale=2,
+                transparent=False,
+                cli=cli,
+            )
+            print(f"     {png.relative_to(ROOT)}")
     return 1 if failures else 0
 
 

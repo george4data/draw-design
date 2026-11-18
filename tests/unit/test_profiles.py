@@ -16,8 +16,7 @@ from helpers import EXAMPLES, example
 
 def brand_theme(tmp_path: Path) -> Path:
     raw = json.loads((THEMES_DIR / "default.json").read_text())
-    raw["light"]["accent"] = "#005f73"
-    raw["dark"]["accent"] = "#94d2bd"
+    raw["colors"]["accent"] = "#005f73"
     p = tmp_path / "acme-theme.json"
     p.write_text(json.dumps(raw))
     return p
@@ -31,7 +30,7 @@ def test_profile_lifecycle(tmp_path: Path, isolated_home: Path) -> None:
     assert not [f for f in findings if f.severity == "error"]
     assert [p["slug"] for p in profiles.list_profiles()] == ["acme"]
     info = profiles.show("acme")
-    assert info["light"]["accent"] == "#005f73" and info["profile"]["sourceUrl"] == "https://acme.test"
+    assert info["colors"]["accent"] == "#005f73" and info["profile"]["sourceUrl"] == "https://acme.test"
     with pytest.raises(DDError):
         profiles.create("acme", "Again")
     with pytest.raises(DDError):

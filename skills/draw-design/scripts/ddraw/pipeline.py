@@ -35,31 +35,26 @@ class BuildResult:
         return not any(f.severity == "error" for f in self.findings)
 
 
-def pick_theme(
-    spec: Spec, *, project: Path | None, theme_path: Path | None, profile: str | None, adaptive: bool
-) -> Theme:
-    primary = "dark" if spec.variant == "dark" else "light"
-    # A dark variant is a fixed dark rendering; the light variant adapts to the viewer's mode.
-    adaptive = adaptive and primary == "light"
+def pick_theme(spec: Spec, *, project: Path | None, theme_path: Path | None, profile: str | None) -> Theme:
     if theme_path:
-        return load_theme(theme_path, adaptive=adaptive, primary=primary)
+        return load_theme(theme_path)
     slug = profile or spec.theme_ref.get("profile")
     if spec.theme_ref.get("path") and project:
-        return load_theme((project / spec.theme_ref["path"]).resolve(), adaptive=adaptive, primary=primary)
+        return load_theme((project / spec.theme_ref["path"]).resolve())
     if slug and slug != "default":
         p = profile_path(slug)
         if p is None or not p.is_file():
             raise DDError(
                 [Finding("THEME-002", f"profile {slug!r} not found", fix="run: ddraw profile list")]
             )
-        return load_theme(p, adaptive=adaptive, primary=primary)
+        return load_theme(p)
     if slug == "default":
-        return load_theme(None, adaptive=adaptive, primary=primary)
+        return load_theme(None)
     if project is not None:
         res = resolve(project)
         if res.status in ("profile", "custom-unsaved") and res.path:
-            return load_theme(res.path, adaptive=adaptive, primary=primary)
-    return load_theme(None, adaptive=adaptive, primary=primary)
+            return load_theme(res.path)
+    return load_theme(None)
 
 
 def resolve_theme_for(project: Path | None, profile: str | None = None) -> Theme:
@@ -214,13 +209,12 @@ def build(
     project: Path | None = None,
     theme_path: Path | None = None,
     profile: str | None = None,
-    adaptive: bool = True,
     run_lint: bool = True,
 ) -> BuildResult:
     spec, findings = validate(data)
     if spec is None:
         raise DDError(findings)
-    theme = pick_theme(spec, project=project, theme_path=theme_path, profile=profile, adaptive=adaptive)
+    theme = pick_theme(spec, project=project, theme_path=theme_path, profile=profile)
     page = compose(spec, theme)
     xml = mxgraph.write(page, theme)
     if run_lint:

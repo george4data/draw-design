@@ -18,8 +18,6 @@ PNG, SVG and PDF exports go through the draw.io Desktop command line.
 | ![Flowchart](gallery/png/flowchart.png) | ![Swimlane](gallery/png/swimlane.png) |
 | ![State machine](gallery/png/state.png) | ![Org chart](gallery/png/org-chart.png) |
 
-Every diagram also ships a dark rendering (`gallery/png/*-dark.png`). The light files store colours as `light-dark()`, so they follow draw.io's dark mode.
-
 > Status: early development (v0.1). See [`docs/prd.md`](docs/prd.md) for the full spec and roadmap, and its §22.10 for what is implemented.
 
 ## What it does today

@@ -173,8 +173,8 @@ def export(
         args += ["-a"]
     elif page is not None:
         args += ["-p", str(page)]
-    if theme in ("dark", "light"):
-        args += ["--theme", theme]
+    # Diagrams have one light palette; pin draw.io's export theme so a dark-mode app cannot invert it.
+    args += ["--theme", "light"]
     args += [*_extra_flags(), str(src)]
     try:
         proc = subprocess.run(args, capture_output=True, text=True, timeout=timeout)
@@ -190,7 +190,7 @@ def export(
     return target
 
 
-def preview(src: Path, page: int | None = None, theme: str | None = None) -> Path:
+def preview(src: Path, page: int | None = None) -> Path:
     tmp = Path(tempfile.mkdtemp(prefix="ddraw-preview-"))
     stem = src.name[: -len(".drawio")] if src.name.endswith(".drawio") else src.stem
-    return export(src, "png", tmp / f"{stem}.png", scale=1.0, page=page, transparent=False, theme=theme)
+    return export(src, "png", tmp / f"{stem}.png", scale=1.0, page=page, transparent=False)
