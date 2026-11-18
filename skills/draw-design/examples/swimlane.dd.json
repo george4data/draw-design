@@ -1,0 +1,26 @@
+{
+  "ddVersion": 1,
+  "type": "swimlane",
+  "title": "Refund handling",
+  "description": "A customer refund request moves from support triage to finance approval and back to the customer, with the finance handoff as the slowest step.",
+  "zones": [
+    { "id": "customer", "label": "Customer" },
+    { "id": "support", "label": "Support" },
+    { "id": "finance", "label": "Finance" }
+  ],
+  "nodes": [
+    { "id": "request", "label": "Request refund", "role": "input", "zone": "customer" },
+    { "id": "triage", "label": "Triage ticket", "sublabel": "zendesk", "zone": "support" },
+    { "id": "check", "label": "Check order", "sublabel": "admin console", "zone": "support" },
+    { "id": "approve", "label": "Approve payout", "sublabel": "≤ 2 days", "zone": "finance", "focal": true },
+    { "id": "notify", "label": "Notify customer", "zone": "support" },
+    { "id": "receive", "label": "Receive refund", "role": "input", "zone": "customer" }
+  ],
+  "edges": [
+    { "from": "request", "to": "triage" },
+    { "from": "triage", "to": "check" },
+    { "from": "check", "to": "approve", "label": "HANDOFF", "kind": "accent" },
+    { "from": "approve", "to": "notify" },
+    { "from": "notify", "to": "receive", "label": "EMAIL" }
+  ]
+}

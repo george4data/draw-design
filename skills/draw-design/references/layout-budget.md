@@ -46,7 +46,7 @@
 | `org-chart` | shipped | nodes 12, edges 12, accent 2, depth 4, breadth 5 |
 | `sequence` | shipped | nodes 5, edges 12, accent 2, lifelines 5, fragments 2 |
 | `state` | shipped | nodes 9, edges 12, accent 2 |
-| `swimlane` | planned | lanes 5 |
+| `swimlane` | shipped | nodes 9, edges 12, accent 2, lanes 5, zones 5 |
 | `tree` | shipped | nodes 9, edges 12, accent 2, depth 4, breadth 5 |
 | `bar` | planned | bars 8 |
 | `db-schema` | planned | nodes 5, edges 6 |

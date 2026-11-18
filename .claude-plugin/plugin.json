@@ -1,6 +1,6 @@
 {
   "name": "draw-design",
-  "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence diagrams, state machines, trees, org charts and layer stacks. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop.",
+  "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence diagrams, swimlanes, state machines, trees, org charts and layer stacks. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop.",
   "version": "0.1.0",
   "author": {
     "name": "George Pulinattu"
@@ -22,6 +22,7 @@
     "org-chart",
     "sequence",
     "state-machine",
+    "swimlane",
     "tree"
   ]
 }

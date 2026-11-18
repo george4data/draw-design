@@ -10,7 +10,7 @@ from ddraw import registry
 from ddraw.emit import mxgraph
 from ddraw.errors import DDError, Finding
 from ddraw.ir import Box, Page, PEdge, TextItem
-from ddraw.layout import bands, layered, sequence, sizing, tree
+from ddraw.layout import bands, lanes, layered, sequence, sizing, tree
 from ddraw.layout import page as page_mod
 from ddraw.lint.runner import lint_text
 from ddraw.route import router
@@ -119,6 +119,8 @@ def compose(spec: Spec, theme: Theme) -> Page:
         bands.layout(spec, page.nodes, area, ramp, fit)
     elif info.grammar == "lifelines":
         sequence.layout(page, area, fit)
+    elif info.grammar == "lanes":
+        page.zones = lanes.layout(spec, page.nodes, area, ramp, fit)
     elif info.grammar == "tree":
         try:
             tree.layout(spec, page.nodes, area, direction, fit)

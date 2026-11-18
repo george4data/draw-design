@@ -1,6 +1,6 @@
 ---
 name: draw-design
-description: Create editorial, on-brand diagrams as native, editable draw.io (.drawio) files — architecture and system diagrams, infrastructure and topology maps, flowcharts and decision flows, sequence diagrams and request flows, state machines and lifecycles, trees and hierarchies, org charts and escalation paths, layer stacks — with orthogonal connectors, one focal accent, a bottom legend and your brand theme, then lint them against editorial rules and export PNG, SVG or PDF through draw.io Desktop. Use when the user wants a draw.io / drawio / diagrams.net diagram, an editable diagram, an on-brand or editorial diagram, or exports of one.
+description: Create editorial, on-brand diagrams as native, editable draw.io (.drawio) files — architecture and system diagrams, infrastructure and topology maps, flowcharts and decision flows, sequence diagrams and request flows, swimlanes and cross-team handoffs, state machines and lifecycles, trees and hierarchies, org charts and escalation paths, layer stacks — with orthogonal connectors, one focal accent, a bottom legend and your brand theme, then lint them against editorial rules and export PNG, SVG or PDF through draw.io Desktop. Use when the user wants a draw.io / drawio / diagrams.net diagram, an editable diagram, an on-brand or editorial diagram, or exports of one.
 license: MIT
 metadata:
   version: "0.1"
@@ -52,10 +52,11 @@ Turn a description of a system, process or decision into an **editorial-quality,
 | Who owns, routes or escalates what: people, teams or agents with reporting lines. | `org-chart` | [type-org-chart.md](references/type-org-chart.md) |
 | Time-ordered messages between a few actors and services (calls, returns, async events). | `sequence` | [type-sequence.md](references/type-sequence.md) |
 | States of one subject and the events that move it between them, with guards. | `state` | [type-state.md](references/type-state.md) |
+| A process across teams or actors, where the handoffs between lanes are the story. | `swimlane` | [type-swimlane.md](references/type-swimlane.md) |
 | A strict parent → children hierarchy (taxonomy, breakdown, file tree). | `tree` | [type-tree.md](references/type-tree.md) |
 <!-- END GENERATED:types -->
 
-Other types (ER, swimlane, nested, deployment, charts and more) are planned. If the request needs one, say so in one line. Then either draw the nearest shipped type, if it genuinely fits (a simple ordered process is a flowchart, and component relationships are architecture), or describe the structure in prose or a table. Never fake a type with the wrong grammar.
+Other types (ER, nested, deployment, charts and more) are planned. If the request needs one, say so in one line. Then either draw the nearest shipped type, if it genuinely fits (a simple ordered process is a flowchart, and component relationships are architecture), or describe the structure in prose or a table. Never fake a type with the wrong grammar.
 
 ## 4. Rules the compiler enforces (and you should design for)
 

@@ -4,11 +4,36 @@
   "family": "process",
   "grammar": "lanes",
   "wave": 1,
-  "status": "planned",
+  "status": "shipped",
   "feasibility": "easy",
   "budget": {
-    "lanes": 5
+    "nodes": 9,
+    "edges": 12,
+    "accent": 2,
+    "lanes": 5,
+    "zones": 5
   },
   "reference": "references/type-swimlane.md",
-  "example": "examples/swimlane.dd.json"
+  "example": "examples/swimlane.dd.json",
+  "roles": [
+    "backend",
+    "store",
+    "external",
+    "input",
+    "optional",
+    "security"
+  ],
+  "directions": [
+    "LR"
+  ],
+  "defaultDirection": "LR",
+  "legendBackend": "STEP",
+  "aliases": [
+    "swimlane",
+    "swim lane",
+    "cross-functional flowchart",
+    "handoff diagram",
+    "process by team"
+  ],
+  "useWhen": "A process across teams or actors, where the handoffs between lanes are the story."
 }
