@@ -6,7 +6,7 @@ allowed-tools: [Bash, Read]
 
 Run the draw-design environment doctor, following `skills/draw-design/references/doctor.md` (the source of truth).
 
-Full argument string: `$ARGUMENTS`
+Full argument string: `$ARGUMENTS`. If the host left that as an unfilled placeholder, use the text the user typed after the command instead.
 
 1. Locate the installed skill directory (the folder containing `skills/draw-design/SKILL.md` of this plugin). Do not assume it is under the current working directory.
 2. Run `<skill-dir>/bin/ddraw doctor $ARGUMENTS`.

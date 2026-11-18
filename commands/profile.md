@@ -6,8 +6,8 @@ allowed-tools: [Bash, Read, Edit]
 
 Manage brand profiles following `skills/draw-design/references/profiles.md` (the source of truth).
 
-Full argument string: `$ARGUMENTS`
+Full argument string: `$ARGUMENTS`. If the host left that as an unfilled placeholder, use the text the user typed after the command instead.
 
-1. Run `<skill-dir>/bin/ddraw profile $ARGUMENTS` (`<skill-dir>` is this plugin's `skills/draw-design`).
+1. Run `<skill-dir>/bin/ddraw profile $ARGUMENTS` (`<skill-dir>` is this plugin's `skills/draw-design`, the folder holding the draw-design `SKILL.md`).
 2. `new` with an existing slug fails: ask the user before retrying with `--force`. `delete` needs explicit confirmation, then `--yes`.
 3. After `new`, offer to set the brand colours (reference §"Making a brand profile"), run `ddraw theme check`, and `use` it for the current project.

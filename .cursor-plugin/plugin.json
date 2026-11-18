@@ -1,0 +1,34 @@
+{
+  "name": "draw-design",
+  "displayName": "Draw Design",
+  "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture (with official AWS, Google Cloud, Azure and Kubernetes icons), flowcharts, sequence diagrams, swimlanes, state machines, trees, org charts and layer stacks. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop.",
+  "version": "0.1.0",
+  "author": {
+    "name": "George Pulinattu"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/george4data/draw-design",
+  "repository": "https://github.com/george4data/draw-design",
+  "keywords": [
+    "architecture",
+    "aws",
+    "azure",
+    "brand",
+    "diagrams",
+    "diagrams.net",
+    "drawio",
+    "editable",
+    "export",
+    "flowchart",
+    "gcp",
+    "kubernetes",
+    "org-chart",
+    "sequence",
+    "state-machine",
+    "swimlane",
+    "tree"
+  ],
+  "logo": ".claude-plugin/icon.png",
+  "skills": "./skills/",
+  "commands": "./commands/"
+}

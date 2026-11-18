@@ -6,7 +6,7 @@
 | Status | Draft v1.0, ready for agent decomposition |
 | Date | 2026-11-17 |
 | Product working name | **draw-design** (plugin id `draw-design`, skill id `draw-design`). The name is open, see [OQ-01](#24-open-questions) |
-| Target hosts (v1) | Claude Code (plugin and skill), OpenAI Codex (plugin and skill) |
+| Target hosts (v1) | Claude Code (plugin and skill), OpenAI Codex (plugin and skill), Cursor (plugin and skill, [ADR 0013](decisions/0013-cursor-host.md)) |
 | Reference product | [`cathrynlavery/diagram-design`](https://github.com/cathrynlavery/diagram-design) v2.6.164 (MIT), local read-only copy at `reference/diagram-design` @ `f6db0de` |
 | Output format reference | draw.io / diagrams.net: [docs](https://www.drawio.com/docs/), [`jgraph/drawio-desktop`](https://github.com/jgraph/drawio-desktop) v32.7.4, local copy at `reference/drawio-desktop` @ `5e84067` |
 
@@ -32,7 +32,7 @@
 - [15. Brand onboarding and client profiles](#15-brand-onboarding-and-client-profiles)
 - [16. Quality gates: `ddraw lint`](#16-quality-gates-ddraw-lint)
 - [17. Commands and CLI surface](#17-commands-and-cli-surface)
-- [18. Host packaging: Claude Code and Codex](#18-host-packaging-claude-code-and-codex)
+- [18. Host packaging: Claude Code, Codex and Cursor](#18-host-packaging-claude-code-codex-and-cursor)
 - [19. Security, privacy and trust](#19-security-privacy-and-trust)
 - [20. Testing, CI and evaluation](#20-testing-ci-and-evaluation)
 - [21. Agentic development process](#21-agentic-development-process)
@@ -372,7 +372,7 @@ mindmap
 - **NG-02** A WYSIWYG editor or a draw.io plugin (JavaScript running inside draw.io).
 - **NG-03** Running a draw.io server, MCP server or web service. A future MCP wrapper is P3 (OQ-07).
 - **NG-04** Pixel-identical reproduction of diagram-design's SVG output.
-- **NG-05** Hosts other than Claude Code and Codex (manifests may be added later without restructuring).
+- **NG-05** Hosts other than Claude Code, Codex and Cursor (manifests may be added later without restructuring; Cursor was added this way, ADR 0013).
 - **NG-06** Auto-installing dependencies (draw.io Desktop, fonts). The doctor reports; the user installs.
 
 ### 4.3 Success metrics
@@ -604,15 +604,19 @@ flowchart LR
     subgraph Repo["GitHub repo (one plugin root)"]
         CP[".claude-plugin/plugin.json<br/>.claude-plugin/marketplace.json"]
         XP[".codex-plugin/plugin.json<br/>.agents/plugins/marketplace.json"]
+        UP[".cursor-plugin/plugin.json<br/>.cursor-plugin/marketplace.json"]
         SK["skills/draw-design/**"]
         CM["commands/*.md"]
     end
     CP --> CC["Claude Code<br/>/plugin marketplace add …<br/>/plugin install draw-design@draw-design"]
     XP --> CX["Codex<br/>codex plugin marketplace add …<br/>codex plugin add draw-design@draw-design"]
+    UP --> CU["Cursor<br/>Customize → From GitHub Repository<br/>agent: /plugin marketplace add …"]
     SK --> CC
     SK --> CX
+    SK --> CU
     CM --> CC
-    SK --> SA["Standalone skill copy/symlink<br/>~/.claude/skills · ~/.agents/skills"]
+    CM --> CU
+    SK --> SA["Standalone skill copy/symlink<br/>~/.claude/skills · ~/.agents/skills · ~/.cursor/skills"]
 ```
 
 ---
@@ -627,6 +631,9 @@ draw-design/
 ├── .codex-plugin/
 │   └── plugin.json                 # Codex plugin manifest (§18.2)
 ├── .agents/plugins/marketplace.json# Codex marketplace catalog
+├── .cursor-plugin/
+│   ├── plugin.json                 # Cursor plugin manifest (§18.3)
+│   └── marketplace.json            # Cursor marketplace catalog
 ├── AGENTS.md                       # build-agent rules (Codex reads this)
 ├── CLAUDE.md                       # "@AGENTS.md" (Claude reads this)
 ├── README.md
@@ -1871,9 +1878,9 @@ Output contract: `Doctor summary: PASS|WARN|FAIL (n pass, n warn, n fail)`, one 
 
 ---
 
-## 18. Host packaging: Claude Code and Codex
+## 18. Host packaging: Claude Code, Codex and Cursor
 
-Principle (reference ADR 0008): **one plugin root, minimal native manifests, zero duplicated content.** Both hosts load `skills/draw-design/`. Claude also loads `commands/`.
+Principle (reference ADR 0008): **one plugin root, minimal native manifests, zero duplicated content.** All three hosts load `skills/draw-design/`. Claude and Cursor also load `commands/`.
 
 ### 18.1 Claude Code
 
@@ -1968,15 +1975,37 @@ codex plugin add draw-design@draw-design
 
 Standalone skill: `ln -s <checkout>/skills/draw-design ~/.agents/skills/draw-design` (verify the current Codex skills root in T-0.3).
 
-### 18.3 Host differences the skill must absorb
+### 18.3 Cursor
 
-| Concern | Claude Code | Codex | Requirement |
-|---|---|---|---|
-| Slash commands | `commands/*.md` → `/draw-design:<name>` | Not guaranteed (OQ-03) | FR-110: every command has an NL route in SKILL.md |
-| Locating the skill dir | SKILL.md path known to the agent | same | FR-111: SKILL.md instructs "run `<this skill dir>/scripts/ddraw`", never cwd-relative |
-| Image viewing (visual self-review) | Read tool shows PNGs | Codex can view local images | FR-045 degrades gracefully when unavailable |
-| Project instructions | `CLAUDE.md` | `AGENTS.md` | Repo ships both (`CLAUDE.md` = `@AGENTS.md`) |
-| Shell | Bash tool | shell tool (sandboxed) | `ddraw` needs no network except opt-in onboarding; export needs the draw.io binary to be allowed by the sandbox (doc in doctor) |
+[ADR 0013](decisions/0013-cursor-host.md). `.cursor-plugin/plugin.json` mirrors the Claude manifest's `name`, `description`, `version`, `author`, `license`, `homepage`, `repository` and `keywords`, and adds:
+
+```json
+{
+  "displayName": "Draw Design",
+  "logo": ".claude-plugin/icon.png",
+  "skills": "./skills/",
+  "commands": "./commands/"
+}
+```
+
+`.cursor-plugin/marketplace.json` has the same `name`, `owner` and `metadata` as the Claude catalog, with one entry `{ "name": "draw-design", "source": "./", "description": "…", "category": "Productivity" }`.
+
+Install (README):
+
+- **Editor:** Customize → From GitHub Repository → `george4data/draw-design`.
+- **CLI:** `/plugin marketplace add https://github.com/george4data/draw-design` inside `agent`.
+
+Standalone skill: `ln -s <checkout>/skills/draw-design ~/.cursor/skills/draw-design`. Cursor also loads `~/.claude/skills` and `~/.agents/skills`, so keep one copy only.
+
+### 18.4 Host differences the skill must absorb
+
+| Concern | Claude Code | Codex | Cursor | Requirement |
+|---|---|---|---|---|
+| Slash commands | `commands/*.md` → `/draw-design:<name>` | Not guaranteed (OQ-03) | plugin `commands/` → `/<name>`; `$ARGUMENTS` not documented | FR-110: every command has an NL route in SKILL.md; commands fall back to the typed text when `$ARGUMENTS` is unfilled |
+| Locating the skill dir | SKILL.md path known to the agent | same | same; `${CURSOR_PLUGIN_ROOT}` is not expanded in skill text | FR-111: SKILL.md instructs "run `<this skill dir>/bin/ddraw`", never cwd-relative |
+| Image viewing (visual self-review) | Read tool shows PNGs | Codex can view local images | Agent can read local images | FR-045 degrades gracefully when unavailable |
+| Project instructions | `CLAUDE.md` | `AGENTS.md` | `AGENTS.md`, `.cursor/rules` | Repo ships both (`CLAUDE.md` = `@AGENTS.md`) |
+| Shell | Bash tool | shell tool (sandboxed) | terminal tool (sandboxed, approval prompts) | `ddraw` needs no network except opt-in onboarding; export needs the draw.io binary to be allowed by the sandbox (doc in doctor) |
 
 - **FR-112** `description`, `keywords` and `version` MUST be identical across manifests (`scripts/verify-plugin-package.py`, LR in CI).
 - **FR-113** Versions are bumped only on `main` after merge (`scripts/bump-version.py`), never in PRs (reference ADR 0009).
@@ -2286,7 +2315,7 @@ Built and verified in the first development session. Agents picking up work shou
 
 | Area | Status | Notes |
 |---|---|---|
-| M0 foundations (T-0.1–T-0.5) | **done** | Manifests (Claude, Codex), CI workflow, ADRs 0001–0010, Makefile, registry with 50 types |
+| M0 foundations (T-0.1–T-0.5) | **done** | Manifests (Claude, Codex, Cursor per ADR 0013), CI workflow, ADRs 0001–0010, Makefile, registry with 50 types |
 | Spec, schema, validator (T-1.1) | **done** | Stdlib JSON Schema subset, JSON-pointer errors, did-you-mean, per-type label rules |
 | Theme, contrast, styles, XML writer (T-1.2–T-1.4) | **done** | plain hex, single light palette (ADR 0011); deterministic, uncompressed output |
 | Text measure, page composition, legend (T-1.5, T-1.6) | **done** | Legend rows wrap; `fit` preset |
@@ -2347,6 +2376,7 @@ Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), vendo
 | OQ-07 | Ship an MCP server wrapper around `ddraw` for other hosts | P3 |
 | OQ-08 | Bundle fonts (OFL) in the skill for deterministic exports? | No (size); doctor recommends install |
 | OQ-09 | Do we keep the reference's exact default palette, or define our own default skin? | Keep (proven contrast), credit in THIRD_PARTY_LICENSES |
+| OQ-13 | Does Cursor install a root-level plugin (`"source": "./"`) from GitHub, and does the skill run end to end in `cursor-agent`? | Assume yes (schema allows it); verify by hand and record the result in ADR 0013 |
 
 ---
 

@@ -1,6 +1,6 @@
 # draw-design
 
-Editorial, on-brand diagrams as **native, editable draw.io files**, for Claude Code and Codex.
+Editorial, on-brand diagrams as **native, editable draw.io files**, for Claude Code, Codex and Cursor.
 
 You describe a system, a process or a flow. The agent picks the diagram type and writes a compact **Diagram Spec** (`*.dd.json`). The bundled `ddraw` compiler then:
 
@@ -50,7 +50,22 @@ codex plugin marketplace add george4data/draw-design
 codex plugin add draw-design@draw-design
 ```
 
-**Standalone skill** (any Agent Skills host): symlink `skills/draw-design` into your host's skills folder, e.g. `~/.claude/skills/draw-design`.
+**Cursor**
+
+- **Editor:** open Customize, choose **From GitHub Repository** and enter `george4data/draw-design`. Install it for the project or for your user.
+- **CLI** (`agent`): run `/plugin marketplace add https://github.com/george4data/draw-design`, then install `draw-design` from `/plugin`.
+
+Cursor also loads skills from `~/.claude/skills` and from installed Claude Code plugins. If you already have draw-design in Claude Code, Cursor may pick it up as is. Keep only one copy installed, or the skill loads twice.
+
+The skill runs its bundled `bin/ddraw` compiler in the terminal. Cursor asks before running it unless you add it to your command allowlist. For exports, Cursor's sandbox must also allow the draw.io Desktop app.
+
+**Standalone skill** (any Agent Skills host): symlink `skills/draw-design` into your host's skills folder:
+
+| Host | Folder |
+|---|---|
+| Claude Code | `~/.claude/skills/draw-design` |
+| Codex | `~/.agents/skills/draw-design` |
+| Cursor | `~/.cursor/skills/draw-design` |
 
 Requirements: Python ≥ 3.10 (standard library only). Optional: [draw.io Desktop](https://github.com/jgraph/drawio-desktop/releases) for export and preview. For faithful exports, also install the theme fonts: Instrument Serif, Geist and Geist Mono (all SIL OFL).
 
@@ -123,7 +138,7 @@ Rename "API" to "Public API" and make it the focal point.
 | "Use our brand colours: navy #1d3557, accent #e63946" | `/draw-design:profile` |
 | "Why isn't export working?" | `/draw-design:doctor` |
 
-In Codex, ask the same things in plain language. The skill is picked up the same way.
+In Cursor, the plugin's commands are in the `/` menu. In Codex, ask the same things in plain language. The skill is picked up the same way everywhere.
 
 Open the `.drawio` file in draw.io Desktop, at [app.diagrams.net](https://app.diagrams.net), or with the VS Code "Draw.io Integration" extension. draw.io Desktop is needed only for exports and the agent's visual check.
 

@@ -24,11 +24,23 @@ def main() -> int:
     codex = json.loads((ROOT / ".codex-plugin/plugin.json").read_text())
     json.loads((ROOT / ".claude-plugin/marketplace.json").read_text())
     json.loads((ROOT / ".agents/plugins/marketplace.json").read_text())
+    cursor = json.loads((ROOT / ".cursor-plugin/plugin.json").read_text())
+    cursor_market = json.loads((ROOT / ".cursor-plugin/marketplace.json").read_text())
     for key in ("name", "description", "version", "keywords", "license"):
-        if claude.get(key) != codex.get(key):
-            errors.append(f"manifest field {key!r} differs between Claude and Codex")
-    if codex.get("skills") != "./skills/":
-        errors.append("codex manifest must point skills at ./skills/")
+        for host, manifest in (("Codex", codex), ("Cursor", cursor)):
+            if claude.get(key) != manifest.get(key):
+                errors.append(f"manifest field {key!r} differs between Claude and {host}")
+    for host, manifest in (("codex", codex), ("cursor", cursor)):
+        if manifest.get("skills") != "./skills/":
+            errors.append(f"{host} manifest must point skills at ./skills/")
+    if cursor.get("commands") != "./commands/":
+        errors.append("cursor manifest must point commands at ./commands/")
+    logo = cursor.get("logo")
+    if not isinstance(logo, str) or not (ROOT / logo).is_file():
+        errors.append(f"cursor manifest logo {logo!r} is not a file in the repo")
+    entries = cursor_market.get("plugins", [])
+    if [e.get("name") for e in entries] != ["draw-design"] or entries[0].get("source") != "./":
+        errors.append("cursor marketplace must list draw-design with source ./")
     skill_md = (SKILL / "SKILL.md").read_text(encoding="utf-8")
     if len(skill_md.encode()) > SKILL_MD_MAX:
         errors.append(f"SKILL.md is {len(skill_md.encode())} bytes (max {SKILL_MD_MAX})")
