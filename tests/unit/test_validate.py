@@ -78,6 +78,7 @@ def test_sequence_alt_fragment_builds_and_validates() -> None:
     seq["fragments"] = [
         {"kind": "alt", "label": "cached", "from": 5, "to": 8, "elseAt": 7, "elseLabel": "expired"}
     ]
+    d["size"] = "fit"
     result = build(d)
     assert result.ok, [f.human() for f in result.findings]
     assert 'dd-role="else"' in result.xml and "[expired]" in result.xml
