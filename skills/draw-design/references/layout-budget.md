@@ -44,7 +44,7 @@
 | `layers` | shipped | nodes 6, edges 5, accent 2, layers 6 |
 | `nested` | planned | levels 6 |
 | `org-chart` | shipped | nodes 12, edges 12, accent 2, depth 4, breadth 5 |
-| `sequence` | planned | lifelines 5 |
+| `sequence` | shipped | nodes 5, edges 12, accent 2, lifelines 5, fragments 2 |
 | `state` | shipped | nodes 9, edges 12, accent 2 |
 | `swimlane` | planned | lanes 5 |
 | `tree` | shipped | nodes 9, edges 12, accent 2, depth 4, breadth 5 |

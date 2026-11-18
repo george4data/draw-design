@@ -68,3 +68,37 @@ def test_flowchart_decision_exits_must_be_labelled() -> None:
     d = copy.deepcopy(example("flowchart"))
     d["edges"][1].pop("label")
     assert ("LR-Y-flowchart-002", "/edges/1/label") in codes(d)
+
+
+def test_sequence_alt_fragment_builds_and_validates() -> None:
+    from ddraw.pipeline import build
+
+    d = example("sequence")
+    seq = d["sequence"]
+    seq["fragments"] = [
+        {"kind": "alt", "label": "cached", "from": 5, "to": 8, "elseAt": 7, "elseLabel": "expired"}
+    ]
+    result = build(d)
+    assert result.ok, [f.human() for f in result.findings]
+    assert 'dd-role="else"' in result.xml and "[expired]" in result.xml
+
+
+@pytest.mark.parametrize(
+    ("fragment", "code"),
+    [
+        ({"kind": "opt", "from": 3, "to": 99}, "SPEC-032"),
+        ({"kind": "opt", "from": 3, "to": 5, "elseAt": 4}, "SPEC-033"),
+        ({"kind": "alt", "from": 3, "to": 5, "elseAt": 3}, "SPEC-033"),
+    ],
+)
+def test_sequence_fragment_errors(fragment: dict[str, Any], code: str) -> None:
+    d = example("sequence")
+    d["sequence"]["fragments"] = [fragment]
+    assert code in {c for c, _ in codes(d)}
+
+
+def test_sequence_needs_its_block() -> None:
+    d = example("sequence")
+    d.pop("sequence")
+    d["nodes"] = [{"id": "a", "label": "A"}]
+    assert "SPEC-030" in {c for c, _ in codes(d)}

@@ -1,0 +1,29 @@
+{
+  "ddVersion": 1,
+  "type": "sequence",
+  "title": "OAuth authorization code flow",
+  "description": "A browser signs in through the web app, which exchanges an authorization code for a token and then calls the API with it.",
+  "size": "doc-wide",
+  "sequence": {
+    "participants": [
+      { "id": "user", "label": "Browser", "role": "actor" },
+      { "id": "app", "label": "Web App", "sublabel": "next.js" },
+      { "id": "auth", "label": "Auth Server", "sublabel": "OIDC", "role": "external" },
+      { "id": "api", "label": "API", "sublabel": "orders" }
+    ],
+    "messages": [
+      { "from": "user", "to": "app", "label": "GET /login" },
+      { "from": "app", "to": "auth", "label": "authorize" },
+      { "from": "auth", "to": "app", "label": "code", "kind": "return" },
+      { "from": "app", "to": "app", "label": "check state" },
+      { "from": "app", "to": "auth", "label": "POST /token", "focal": true },
+      { "from": "auth", "to": "app", "label": "access token", "kind": "return" },
+      { "from": "app", "to": "api", "label": "GET /me" },
+      { "from": "api", "to": "app", "label": "200 profile", "kind": "return" },
+      { "from": "app", "to": "user", "label": "session cookie", "kind": "return" }
+    ],
+    "fragments": [
+      { "kind": "opt", "label": "no cached token", "from": 5, "to": 6 }
+    ]
+  }
+}

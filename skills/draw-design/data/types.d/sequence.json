@@ -4,11 +4,37 @@
   "family": "process",
   "grammar": "lifelines",
   "wave": 1,
-  "status": "planned",
+  "status": "shipped",
   "feasibility": "easy",
   "budget": {
-    "lifelines": 5
+    "nodes": 5,
+    "edges": 12,
+    "accent": 2,
+    "lifelines": 5,
+    "fragments": 2
   },
   "reference": "references/type-sequence.md",
-  "example": "examples/sequence.dd.json"
+  "example": "examples/sequence.dd.json",
+  "roles": [
+    "actor",
+    "service",
+    "store",
+    "external"
+  ],
+  "directions": [
+    "TB"
+  ],
+  "defaultDirection": "TB",
+  "edgeLabelMax": 24,
+  "upperLabels": false,
+  "selfLoops": true,
+  "legendBackend": "SERVICE",
+  "aliases": [
+    "sequence diagram",
+    "message flow",
+    "interaction diagram",
+    "call flow",
+    "request flow"
+  ],
+  "useWhen": "Time-ordered messages between a few actors and services (calls, returns, async events)."
 }

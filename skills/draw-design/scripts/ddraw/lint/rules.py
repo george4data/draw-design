@@ -16,7 +16,33 @@ from ddraw.lint.model import Cell, DrawPage
 from ddraw.text.measure import width
 from ddraw.theme.model import Theme
 
-NON_NODE_ROLES = {"title", "eyebrow", "subtitle", "zone", "tag", "legend", "callout", "ledger", "edge", ""}
+NON_NODE_ROLES = {
+    "title",
+    "eyebrow",
+    "subtitle",
+    "zone",
+    "tag",
+    "legend",
+    "callout",
+    "ledger",
+    "edge",
+    "",
+    "activation",
+    "fragment",
+    "guard",
+    "else",
+}
+
+
+def obstacle(c: Cell) -> Box:
+    """The part of a node that connectors and labels must avoid (a lifeline's header only)."""
+    assert c.abs_box is not None
+    if c.style.get("shape") == "umlLifeline":
+        b = c.abs_box
+        return Box(b.x, b.y, b.w, float(c.style.get("size", "40")))
+    return c.abs_box
+
+
 SAFE_LINK = re.compile(r"^(https://|mailto:|data:page/id,)")
 COLOR_KEYS = ("fillColor", "strokeColor", "fontColor", "labelBackgroundColor")
 HEX = re.compile(r"#[0-9a-fA-F]{6}\b")
@@ -220,7 +246,7 @@ def g004(page: DrawPage, ctx: Context) -> list[Finding]:
         assert a.abs_box is not None and b.abs_box is not None
         if a.parent == b.id or b.parent == a.id:
             continue
-        if a.abs_box.intersects(b.abs_box):
+        if obstacle(a).intersects(obstacle(b)):
             out.append(Finding("LR-G004", f"overlaps {b.id}", cell=a.id, severity=sev(ctx)))
     return out
 
@@ -438,7 +464,7 @@ def c005(page: DrawPage, ctx: Context) -> list[Finding]:
             for n in nodes:
                 if n.id in (c.source, c.target) or n.abs_box is None:
                     continue
-                bx = n.abs_box.inflate(-1)
+                bx = obstacle(n).inflate(-1)
                 if (
                     min(a[0], b[0]) < bx.right
                     and max(a[0], b[0]) > bx.x
@@ -466,7 +492,7 @@ def c006(page: DrawPage, ctx: Context) -> list[Finding]:
         if lb is None:
             continue
         for n in nodes:
-            if n.abs_box is not None and lb.intersects(n.abs_box):
+            if n.abs_box is not None and lb.intersects(obstacle(n)):
                 out.append(
                     Finding(
                         "LR-C006",

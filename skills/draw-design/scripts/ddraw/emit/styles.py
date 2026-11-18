@@ -5,6 +5,11 @@ from __future__ import annotations
 from ddraw.theme.model import Theme
 
 ALLOWED = {
+    "dropTarget",
+    "lifelineDashed",
+    "participant",
+    "width",
+    "height",
     # vertex
     "shape",
     "rounded",
@@ -146,7 +151,13 @@ def treatment(theme: Theme, name: str, sketch: bool = False) -> Style:
     return out
 
 
-def node_style(theme: Theme, treatment_name: str, shape: str, has_tag: bool, sketch: bool, h: float) -> str:
+def styles_num(v: float) -> str:
+    return fmt(float(v))
+
+
+def node_style(
+    theme: Theme, treatment_name: str, shape: str, has_tag: bool, sketch: bool, h: float, header: float = 48
+) -> str:
     pairs = treatment(theme, treatment_name, sketch)
     base = ""
     if shape == "pill":
@@ -166,6 +177,18 @@ def node_style(theme: Theme, treatment_name: str, shape: str, has_tag: bool, ske
         ]
         if shape == "ring":
             pairs += [("shape", "doubleEllipse")]
+    elif shape == "lifeline":
+        pairs += [
+            ("shape", "umlLifeline"),
+            ("perimeter", "lifelinePerimeter"),
+            ("size", styles_num(header)),
+            ("container", "1"),
+            ("collapsible", "0"),
+            ("dropTarget", "0"),
+            ("lifelineDashed", "1"),
+        ]
+        pairs += [("verticalAlign", "top"), ("spacingTop", "8")]
+        return render(base, [*pairs, ("align", "center"), ("spacing", "4")])
     elif shape == "state":
         pairs = [(k, str(theme.raw["radius"]["lg"]) if k == "arcSize" else v) for k, v in pairs]
     elif shape == "ellipse":
@@ -244,6 +267,7 @@ def edge_style(
     bidirectional: bool,
     transit: bool,
     ramp_arrow: int,
+    straight: bool = False,
 ) -> str:
     sx, sy, tx, ty = ports
     stroke = {
@@ -256,7 +280,7 @@ def edge_style(
     w = 1.2 if kind == "accent" else 1.0
     end_arrow, end_fill = ("open", "0") if kind == "async" else ("block", "1")
     pairs: Style = [
-        ("edgeStyle", "orthogonalEdgeStyle"),
+        ("edgeStyle", "none" if straight else "orthogonalEdgeStyle"),
         ("rounded", "1"),
         ("orthogonalLoop", "1"),
         ("jettySize", "auto"),
@@ -356,5 +380,71 @@ def frame_style() -> str:
             ("html", "1"),
             ("locked", "1"),
             ("selectable", "0"),
+        ],
+    )
+
+
+def extra_style(theme: Theme, role: str) -> str:
+    mono = theme.font("mono")
+    if role == "activation":
+        return render(
+            "",
+            [
+                ("html", "1"),
+                ("fillColor", theme.c("ink", 0.06)),
+                ("strokeColor", theme.c("muted")),
+                ("strokeWidth", "0.8"),
+                ("shadow", "0"),
+                ("movable", "0"),
+                ("resizable", "1"),
+            ],
+        )
+    if role == "fragment":
+        return render(
+            "",
+            [
+                ("shape", "umlFrame"),
+                ("width", "48"),
+                ("height", "20"),
+                ("whiteSpace", "wrap"),
+                ("html", "1"),
+                ("pointerEvents", "0"),
+                ("fillColor", theme.c("ink", 0.05)),
+                ("strokeColor", theme.c("ink", 0.30)),
+                ("strokeWidth", "1"),
+                ("fontFamily", mono),
+                ("fontSize", "8"),
+                ("fontColor", theme.c("soft")),
+                ("align", "center"),
+                ("verticalAlign", "middle"),
+                ("spacing", "0"),
+                ("shadow", "0"),
+            ],
+        )
+    if role == "else":
+        return render(
+            "line",
+            [
+                ("html", "1"),
+                ("strokeColor", theme.c("ink", 0.30)),
+                ("strokeWidth", "1"),
+                ("dashed", "1"),
+                ("dashPattern", "4 3"),
+            ],
+        )
+    # guard text
+    return render(
+        "text",
+        [
+            ("html", "1"),
+            ("whiteSpace", "nowrap"),
+            ("align", "left"),
+            ("verticalAlign", "middle"),
+            ("fontFamily", mono),
+            ("fontSize", "8"),
+            ("fontColor", theme.c("soft")),
+            ("spacing", "0"),
+            ("fillColor", "none"),
+            ("strokeColor", "none"),
         ],
     )

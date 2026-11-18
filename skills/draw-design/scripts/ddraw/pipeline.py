@@ -10,7 +10,7 @@ from ddraw import registry
 from ddraw.emit import mxgraph
 from ddraw.errors import DDError, Finding
 from ddraw.ir import Box, Page, PEdge, TextItem
-from ddraw.layout import bands, layered, sizing, tree
+from ddraw.layout import bands, layered, sequence, sizing, tree
 from ddraw.layout import page as page_mod
 from ddraw.lint.runner import lint_text
 from ddraw.route import router
@@ -117,6 +117,8 @@ def compose(spec: Spec, theme: Theme) -> Page:
     page.content = area
     if info.grammar == "bands":
         bands.layout(spec, page.nodes, area, ramp, fit)
+    elif info.grammar == "lifelines":
+        sequence.layout(page, area, fit)
     elif info.grammar == "tree":
         try:
             tree.layout(spec, page.nodes, area, direction, fit)
@@ -157,6 +159,7 @@ def compose(spec: Spec, theme: Theme) -> Page:
         raise DDError([Finding("LAYOUT-000", f"no layout engine for grammar {info.grammar!r} yet")])
     if fit:
         boxes = [pn.box for pn in page.nodes.values()] + [z.box for z in page.zones.values()]
+        boxes += [x.box for x in page.extras if not x.parent]
         right = max(b.right for b in boxes)
         lowest = max(b.bottom for b in boxes)
         title_w = max((t.box.right for t in page.texts), default=0)
@@ -167,7 +170,8 @@ def compose(spec: Spec, theme: Theme) -> Page:
         fh = ceil4(lowest + 24 + strip + safe)
         page.frame = Box(0, 0, fw, fh)
         page.content = Box(safe, content_top, fw - 2 * safe, lowest - content_top)
-    router.route(page.edges, page.nodes, page.frame.inflate(-8), direction, ramp, mode=info.routing)
+    if not page.prerouted:
+        router.route(page.edges, page.nodes, page.frame.inflate(-8), direction, ramp, mode=info.routing)
     if has_legend:
         page_mod.legend(page, page.frame.h - safe - strip)
     for i, c in enumerate(spec.callouts):

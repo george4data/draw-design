@@ -21,6 +21,8 @@ TREATMENT_BY_ROLE = {
     "initial": "backend",
     "final": "backend",
     "layer": "backend",
+    "service": "backend",
+    "actor": "input",
     "store": "store",
     "external": "external",
     "input": "input",

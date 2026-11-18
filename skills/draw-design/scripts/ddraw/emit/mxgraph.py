@@ -8,7 +8,7 @@ from collections.abc import Callable
 
 from ddraw import __version__
 from ddraw.emit import styles
-from ddraw.ir import Box, Page, PEdge, PNode, Point
+from ddraw.ir import Box, ExtraCell, Page, PEdge, PNode, Point
 from ddraw.theme.model import Theme
 
 
@@ -204,9 +204,14 @@ def write(page: Page, theme: Theme) -> str:
             zid = page.zones[zid].zone.parent if zid in page.zones else ""
         return chain
 
-    # Edges are written before nodes so lines sit behind boxes.
-    for pe in sorted(page.edges, key=lambda e: e.edge.index):
-        _write_edge(w, pe, page, theme, zone_chain)
+    for x in page.extras:
+        if x.role in ("fragment", "guard", "else"):
+            _write_extra(w, x, page, theme)
+
+    # Edges are normally written before nodes so lines sit behind boxes.
+    if page.edges_first:
+        for pe in sorted(page.edges, key=lambda e: e.edge.index):
+            _write_edge(w, pe, page, theme, zone_chain)
 
     for pn in sorted(page.nodes.values(), key=lambda p: p.node.index):
         pid, ox, oy = node_parent(pn)
@@ -223,7 +228,15 @@ def write(page: Page, theme: Theme) -> str:
         w.cell(
             f"dd-{pn.id}",
             value=node_label(pn, theme, ramp),
-            style=styles.node_style(theme, pn.treatment, pn.shape, bool(pn.node.tag), spec.sketch, pn.box.h),
+            style=styles.node_style(
+                theme,
+                pn.treatment,
+                pn.shape,
+                bool(pn.node.tag),
+                spec.sketch,
+                pn.box.h,
+                page.ramp["minNodeHeight"],
+            ),
             parent=pid,
             vertex=True,
             geometry=geom(pn.box, ox, oy),
@@ -243,6 +256,13 @@ def write(page: Page, theme: Theme) -> str:
                 connectable=False,
                 user={"dd-role": "tag"},
             )
+
+    for x in page.extras:
+        if x.role == "activation":
+            _write_extra(w, x, page, theme)
+    if not page.edges_first:
+        for pe in sorted(page.edges, key=lambda e: e.edge.index):
+            _write_edge(w, pe, page, theme, zone_chain)
 
     for t, target in page.callouts:
         w.cell(
@@ -348,7 +368,13 @@ def _write_edge(
     assert sp is not None and dp is not None
     points = pe.path[1:-1]
     style = styles.edge_style(
-        theme, e.kind, (sp.fx, sp.fy, dp.fx, dp.fy), e.bidirectional, e.transit, page.ramp["arrow"]
+        theme,
+        e.kind,
+        (sp.fx, sp.fy, dp.fx, dp.fy),
+        e.bidirectional,
+        e.transit,
+        page.ramp["arrow"],
+        straight=page.prerouted and len(pe.path) == 2,
     )
     value = tracked(e.label, 0.06) if e.label else ""
     w.cell(
@@ -367,4 +393,24 @@ def _write_edge(
             **({"dd-transit": "1"} if e.transit else {}),
             **({"dd-bus": "1"} if pe.bus else {}),
         },
+    )
+
+
+def _write_extra(w: Writer, x: ExtraCell, page: Page, theme: Theme) -> None:
+    parent = f"dd-{x.parent}" if x.parent else "1"
+    if x.role == "fragment":
+        value = tracked(x.label, 0.08)
+    elif x.role == "guard":
+        value = esc(x.label)
+    else:
+        value = ""
+    w.cell(
+        f"dd-{x.id}",
+        value=value,
+        style=styles.extra_style(theme, x.role),
+        parent=parent,
+        vertex=True,
+        geometry=geom(x.box),
+        connectable=False,
+        user={"dd-role": x.role},
     )

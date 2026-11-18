@@ -143,7 +143,7 @@ def semantic(spec: Spec) -> list[Finding]:
                 )
         if e.src == e.dst and not info.self_loops:
             out.append(Finding("SPEC-024", "self-loops are not allowed for this type", pointer=f"/edges/{i}"))
-        if (e.src, e.dst) in pairs:
+        if (e.src, e.dst) in pairs and info.grammar != "lifelines":
             out.append(
                 Finding(
                     "SPEC-026",
@@ -176,6 +176,8 @@ def semantic(spec: Spec) -> list[Finding]:
             )
     if info.routing == "bus":
         out.extend(_tree_checks(spec))
+    if info.grammar == "lifelines":
+        out.extend(_sequence_checks(spec, info))
     budget = registry.type_budget(spec.type, spec.detail)
     accents = sum(1 for n in spec.nodes if n.focal) + sum(1 for e in spec.edges if e.kind == "accent")
     if accents > budget["accent"]:
@@ -236,6 +238,86 @@ def semantic(spec: Spec) -> list[Finding]:
                                 fix="label every exit, e.g. YES / NO",
                             )
                         )
+    return out
+
+
+def _sequence_checks(spec: Spec, info: registry.TypeInfo) -> list[Finding]:
+    out: list[Finding] = []
+    seq = spec.raw.get("sequence")
+    if not isinstance(seq, dict):
+        return [
+            Finding(
+                "SPEC-030",
+                'sequence diagrams need a "sequence" block with participants and messages',
+                pointer="/sequence",
+                fix="see references/type-sequence.md",
+            )
+        ]
+    if spec.raw.get("nodes") or spec.raw.get("edges"):
+        out.append(
+            Finding(
+                "SPEC-031",
+                "use sequence.participants and sequence.messages, not nodes/edges",
+                pointer="/nodes",
+            )
+        )
+    budget = registry.type_budget(spec.type, spec.detail)
+    if len(spec.nodes) > budget.get("lifelines", 5):
+        out.append(
+            Finding(
+                "LR-B005",
+                f"{len(spec.nodes)} lifelines; at most {budget.get('lifelines', 5)}",
+                pointer="/sequence/participants",
+                fix="merge participants or split the flow",
+            )
+        )
+    n_msgs = len(spec.edges)
+    frags = seq.get("fragments", [])
+    if len(frags) > budget.get("fragments", 2):
+        out.append(
+            Finding(
+                "LR-B005",
+                f"{len(frags)} fragments; at most {budget.get('fragments', 2)}",
+                pointer="/sequence/fragments",
+            )
+        )
+    spans: list[tuple[int, int]] = []
+    for i, f in enumerate(frags):
+        lo, hi = int(f["from"]), int(f["to"])
+        if not 1 <= lo <= hi <= n_msgs:
+            out.append(
+                Finding(
+                    "SPEC-032",
+                    f"fragment covers messages {lo}–{hi}; messages are numbered 1–{n_msgs}",
+                    pointer=f"/sequence/fragments/{i}",
+                )
+            )
+        if "elseAt" in f and not lo < int(f["elseAt"]) <= hi:
+            out.append(
+                Finding(
+                    "SPEC-033",
+                    "elseAt must fall inside the fragment, after its first message",
+                    pointer=f"/sequence/fragments/{i}/elseAt",
+                )
+            )
+        if "elseAt" in f and f["kind"] != "alt":
+            out.append(
+                Finding(
+                    "SPEC-033",
+                    "only alt fragments have an else region",
+                    pointer=f"/sequence/fragments/{i}/elseAt",
+                )
+            )
+        for a, b in spans:
+            overlap = not (hi < a or lo > b)
+            nested = (a <= lo and hi <= b) or (lo <= a and b <= hi)
+            if overlap and not nested:
+                out.append(
+                    Finding(
+                        "SPEC-034", "fragments must nest or be disjoint", pointer=f"/sequence/fragments/{i}"
+                    )
+                )
+        spans.append((lo, hi))
     return out
 
 

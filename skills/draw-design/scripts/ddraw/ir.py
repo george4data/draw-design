@@ -110,6 +110,17 @@ class LegendItem:
 
 
 @dataclass
+class ExtraCell:
+    """Type-specific decoration (activation bar, fragment frame, guard text, divider)."""
+
+    id: str
+    role: str
+    box: Box
+    label: str = ""
+    parent: str = ""  # node id for nested cells (coordinates relative to that node)
+
+
+@dataclass
 class Page:
     spec: Spec
     preset: dict[str, Any]
@@ -124,3 +135,6 @@ class Page:
     legend: list[LegendItem] = field(default_factory=list)
     legend_rule: Box | None = None
     callouts: list[tuple[TextItem, str]] = field(default_factory=list)
+    extras: list[ExtraCell] = field(default_factory=list)
+    edges_first: bool = True
+    prerouted: bool = False

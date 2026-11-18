@@ -34,6 +34,7 @@ class Edge:
     to_side: str = ""
     transit: bool = False
     index: int = 0
+    msg_kind: str = ""  # sequence diagrams: sync | async | return
 
 
 @dataclass
@@ -85,6 +86,39 @@ class Spec:
         raise KeyError(node_id)
 
 
+SEQ_ROLE = {"actor": "actor", "service": "service", "store": "store", "external": "external"}
+SEQ_KIND = {"sync": "default", "async": "async", "return": "return"}
+
+
+def _sequence_parts(seq: dict[str, Any]) -> tuple[list[Node], list[Edge]]:
+    nodes = [
+        Node(
+            id=p["id"],
+            label=p["label"],
+            sublabel=p.get("sublabel", ""),
+            role=p.get("role", "service"),
+            focal=bool(p.get("focal", False)),
+            index=i,
+        )
+        for i, p in enumerate(seq.get("participants", []))
+    ]
+    edges = []
+    for i, m in enumerate(seq.get("messages", [])):
+        kind = m.get("kind", "sync")
+        edges.append(
+            Edge(
+                id=f"m{i + 1}",
+                src=m["from"],
+                dst=m["to"],
+                label=m.get("label", ""),
+                kind="accent" if m.get("focal") else SEQ_KIND.get(kind, "default"),
+                index=i,
+                msg_kind=kind,
+            )
+        )
+    return nodes, edges
+
+
 def from_dict(d: dict[str, Any]) -> Spec:
     nodes = [
         Node(
@@ -130,6 +164,8 @@ def from_dict(d: dict[str, Any]) -> Spec:
         for i, z in enumerate(d.get("zones", []))
     ]
     callouts = [Callout(c["text"], c["target"], c.get("corner", "tr")) for c in d.get("callouts", [])]
+    if "sequence" in d:
+        nodes, edges = _sequence_parts(d["sequence"])
     return Spec(
         type=d["type"],
         title=d["title"],
