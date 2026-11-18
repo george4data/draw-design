@@ -1,0 +1,12 @@
+{
+  "slug": "unit-grid",
+  "name": "Unit grid",
+  "family": "charts",
+  "grammar": "grid",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {},
+  "reference": "references/type-unit-grid.md",
+  "example": "examples/unit-grid.dd.json"
+}

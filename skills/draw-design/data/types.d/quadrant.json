@@ -1,0 +1,14 @@
+{
+  "slug": "quadrant",
+  "name": "Quadrant",
+  "family": "strategy",
+  "grammar": "axes",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "items": 12
+  },
+  "reference": "references/type-quadrant.md",
+  "example": "examples/quadrant.dd.json"
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "swimlane",
+  "name": "Swimlane",
+  "family": "process",
+  "grammar": "lanes",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "lanes": 5
+  },
+  "reference": "references/type-swimlane.md",
+  "example": "examples/swimlane.dd.json"
+}

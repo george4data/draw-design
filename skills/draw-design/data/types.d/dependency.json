@@ -1,0 +1,14 @@
+{
+  "slug": "dependency",
+  "name": "Dependency graph",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "edges": 14
+  },
+  "reference": "references/type-dependency.md",
+  "example": "examples/dependency.dd.json"
+}

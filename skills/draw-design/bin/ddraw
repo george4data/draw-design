@@ -1,0 +1,11 @@
+#!/bin/sh
+# draw-design compiler launcher. Usage: bin/ddraw <subcommand> [...]
+DIR="$(cd "$(dirname "$0")/.." && pwd)"
+PY="${DDRAW_PYTHON:-}"
+if [ -z "$PY" ]; then
+  for c in python3 python; do
+    if command -v "$c" >/dev/null 2>&1 && "$c" -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)' 2>/dev/null; then PY="$c"; break; fi
+  done
+fi
+if [ -z "$PY" ]; then echo "ddraw: Python 3.10+ not found" >&2; exit 3; fi
+PYTHONPATH="$DIR/scripts${PYTHONPATH:+:$PYTHONPATH}" exec "$PY" -m ddraw "$@"

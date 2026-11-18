@@ -1,0 +1,14 @@
+{
+  "slug": "polar",
+  "name": "Polar chart",
+  "family": "charts",
+  "grammar": "radial",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "categories": 8
+  },
+  "reference": "references/type-polar.md",
+  "example": "examples/polar.dd.json"
+}

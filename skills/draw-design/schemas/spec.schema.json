@@ -1,0 +1,113 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://draw-design.dev/schemas/spec.schema.json",
+  "title": "draw-design Diagram Spec",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["ddVersion", "type", "title", "description"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "ddVersion": { "const": 1 },
+    "type": { "type": "string", "pattern": "^[a-z][a-z0-9-]{1,40}$" },
+    "pattern": { "type": "string", "enum": ["fan-in-queue", "stage-slots", "unstructured-to-artifact", "paired-policy-traces", "secure-paved-road", "control-catalog", "compensating-layers", "traceable-blocks", "lifecycle-phase-map"] },
+    "variant": { "type": "string", "enum": ["light", "dark", "full", "both", "consultant", "terminal"] },
+    "title": { "type": "string", "minLength": 1, "maxLength": 60 },
+    "description": { "type": "string", "minLength": 10, "maxLength": 200 },
+    "eyebrow": { "type": "string", "maxLength": 32 },
+    "subtitle": { "type": "string", "maxLength": 120 },
+    "size": { "type": "string", "enum": ["doc-inline", "doc-wide", "slide-16x9", "slide-4x3", "social-og", "social-square", "print-a4-landscape", "print-a3-landscape", "print-letter-landscape", "fit"] },
+    "detail": { "type": "string", "enum": ["faithful", "balanced", "simplified"] },
+    "audience": { "type": "string", "enum": ["engineer", "mixed", "executive"] },
+    "direction": { "type": "string", "enum": ["LR", "TB", "RL", "BT"] },
+    "sketch": { "type": "boolean" },
+    "iconStyle": { "type": "string", "enum": ["vendor", "mono"] },
+    "platform": { "type": "string", "enum": ["aws", "gcp", "azure", "kubernetes", "generic"] },
+    "theme": { "$ref": "#/$defs/themeRef" },
+    "nodes": { "type": "array", "maxItems": 40, "items": { "$ref": "#/$defs/node" } },
+    "edges": { "type": "array", "maxItems": 60, "items": { "$ref": "#/$defs/edge" } },
+    "zones": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/zone" } },
+    "legend": { "type": ["string", "boolean"], "enum": ["auto", false] },
+    "callouts": { "type": "array", "maxItems": 2, "items": { "$ref": "#/$defs/callout" } },
+    "ledger": { "$ref": "#/$defs/ledger" }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]{0,47}$" },
+    "themeRef": {
+      "type": "object", "additionalProperties": false,
+      "properties": { "profile": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]{0,63}$" }, "path": { "type": "string" } }
+    },
+    "place": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "rank": { "type": "integer", "minimum": 0, "maximum": 20 },
+        "order": { "type": "integer", "minimum": 0, "maximum": 40 },
+        "row": { "type": "integer", "minimum": 0 },
+        "col": { "type": "integer", "minimum": 0 },
+        "lane": { "type": "string" },
+        "step": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "pin": {
+      "type": "object", "additionalProperties": false, "required": ["x", "y"],
+      "properties": { "x": { "type": "number" }, "y": { "type": "number" }, "w": { "type": "number", "minimum": 8 }, "h": { "type": "number", "minimum": 8 } }
+    },
+    "node": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "sublabel": { "type": "string", "maxLength": 40 },
+        "role": { "type": "string", "pattern": "^[a-z][a-z-]{1,24}$" },
+        "tag": { "type": "string", "pattern": "^[A-Za-z0-9]{1,6}$" },
+        "focal": { "type": "boolean" },
+        "icon": { "type": "string", "pattern": "^[a-z0-9][a-z0-9_.:-]{0,80}$" },
+        "zone": { "$ref": "#/$defs/id" },
+        "place": { "$ref": "#/$defs/place" },
+        "pin": { "$ref": "#/$defs/pin" },
+        "meta": { "type": "object", "maxProperties": 12, "additionalProperties": { "type": "string", "maxLength": 200 } }
+      }
+    },
+    "edge": {
+      "type": "object", "additionalProperties": false, "required": ["from", "to"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "from": { "$ref": "#/$defs/id" },
+        "to": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "maxLength": 14 },
+        "kind": { "type": "string", "enum": ["default", "accent", "link", "async", "return"] },
+        "bidirectional": { "type": "boolean" },
+        "fromSide": { "type": "string", "enum": ["top", "right", "bottom", "left"] },
+        "toSide": { "type": "string", "enum": ["top", "right", "bottom", "left"] },
+        "transit": { "type": "boolean" }
+      }
+    },
+    "zone": {
+      "type": "object", "additionalProperties": false, "required": ["id", "label"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" },
+        "label": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "role": { "type": "string", "enum": ["zone", "security", "admin", "traffic"] },
+        "parent": { "$ref": "#/$defs/id" },
+        "icon": { "type": "string" }
+      }
+    },
+    "callout": {
+      "type": "object", "additionalProperties": false, "required": ["text", "target"],
+      "properties": {
+        "text": { "type": "string", "minLength": 1, "maxLength": 48 },
+        "target": { "$ref": "#/$defs/id" },
+        "corner": { "type": "string", "enum": ["tl", "tr", "bl", "br"] }
+      }
+    },
+    "ledger": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "summary": { "type": "string", "maxLength": 200 },
+        "merged": { "type": "array", "items": { "type": "string", "maxLength": 200 } },
+        "collapsed": { "type": "array", "items": { "type": "string", "maxLength": 200 } },
+        "dropped": { "type": "array", "items": { "type": "string", "maxLength": 200 } },
+        "kept": { "type": "array", "items": { "type": "string", "maxLength": 200 } }
+      }
+    }
+  }
+}

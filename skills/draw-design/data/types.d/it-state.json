@@ -1,0 +1,14 @@
+{
+  "slug": "it-state",
+  "name": "IT current-state",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "nodes": 16
+  },
+  "reference": "references/type-it-state.md",
+  "example": "examples/it-state.dd.json"
+}

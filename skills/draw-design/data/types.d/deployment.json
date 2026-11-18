@@ -1,0 +1,16 @@
+{
+  "slug": "deployment",
+  "name": "Deployment",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "zones": 3,
+    "nodes": 6,
+    "edges": 8
+  },
+  "reference": "references/type-deployment.md",
+  "example": "examples/deployment.dd.json"
+}

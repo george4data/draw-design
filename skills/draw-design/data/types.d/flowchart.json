@@ -1,0 +1,41 @@
+{
+  "slug": "flowchart",
+  "name": "Flowchart",
+  "family": "process",
+  "grammar": "layered",
+  "wave": 1,
+  "status": "shipped",
+  "feasibility": "easy",
+  "budget": {
+    "nodes": 9,
+    "edges": 12,
+    "accent": 2,
+    "decisionExits": 3
+  },
+  "reference": "references/type-flowchart.md",
+  "example": "examples/flowchart.dd.json",
+  "roles": [
+    "start",
+    "end",
+    "step",
+    "decision",
+    "backend",
+    "store",
+    "external",
+    "input",
+    "optional"
+  ],
+  "directions": [
+    "TB",
+    "LR"
+  ],
+  "defaultDirection": "TB",
+  "aliases": [
+    "flowchart",
+    "flow chart",
+    "decision flow",
+    "process flow",
+    "decision tree"
+  ],
+  "useWhen": "Decision logic with branches; every exit of a decision is labelled."
+}

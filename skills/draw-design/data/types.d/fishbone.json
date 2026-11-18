@@ -1,0 +1,14 @@
+{
+  "slug": "fishbone",
+  "name": "Fishbone",
+  "family": "strategy",
+  "grammar": "bespoke",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "bones": 6
+  },
+  "reference": "references/type-fishbone.md",
+  "example": "examples/fishbone.dd.json"
+}

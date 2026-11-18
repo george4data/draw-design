@@ -1,0 +1,12 @@
+{
+  "slug": "state",
+  "name": "State machine",
+  "family": "process",
+  "grammar": "layered",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {},
+  "reference": "references/type-state.md",
+  "example": "examples/state.dd.json"
+}

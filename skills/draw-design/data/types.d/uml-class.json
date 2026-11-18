@@ -1,0 +1,15 @@
+{
+  "slug": "uml-class",
+  "name": "UML class",
+  "family": "data",
+  "grammar": "layered",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "nodes": 7,
+    "edges": 8
+  },
+  "reference": "references/type-uml-class.md",
+  "example": "examples/uml-class.dd.json"
+}

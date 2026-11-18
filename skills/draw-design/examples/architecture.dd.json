@@ -1,0 +1,31 @@
+{
+  "ddVersion": 1,
+  "type": "architecture",
+  "title": "Checkout platform",
+  "description": "Requests from web and mobile clients pass through an API gateway to the order and payment services, which persist to Postgres.",
+  "size": "doc-inline",
+  "direction": "LR",
+  "zones": [
+    { "id": "clients", "label": "Clients" },
+    { "id": "core", "label": "Core services" },
+    { "id": "data", "label": "Data" }
+  ],
+  "nodes": [
+    { "id": "web", "label": "Web App", "sublabel": "next.js", "role": "input", "zone": "clients" },
+    { "id": "mobile", "label": "Mobile App", "sublabel": "swift", "role": "input", "zone": "clients" },
+    { "id": "gw", "label": "API Gateway", "sublabel": "nginx · :443", "tag": "EDGE", "zone": "core", "focal": true },
+    { "id": "orders", "label": "Orders", "sublabel": "grpc :9001", "tag": "API", "zone": "core" },
+    { "id": "pay", "label": "Payments", "sublabel": "grpc :9002", "tag": "API", "zone": "core" },
+    { "id": "pg", "label": "Postgres", "sublabel": "orders · payments", "role": "store", "tag": "DB", "zone": "data" },
+    { "id": "stripe", "label": "Stripe", "sublabel": "payments API", "role": "external", "tag": "EXT" }
+  ],
+  "edges": [
+    { "from": "web", "to": "gw", "label": "HTTPS", "kind": "link" },
+    { "from": "mobile", "to": "gw", "label": "HTTPS", "kind": "link" },
+    { "from": "gw", "to": "orders", "kind": "accent" },
+    { "from": "gw", "to": "pay" },
+    { "from": "orders", "to": "pg", "label": "SQL" },
+    { "from": "pay", "to": "pg", "label": "SQL" },
+    { "from": "pay", "to": "stripe", "label": "CHARGE", "kind": "link" }
+  ]
+}

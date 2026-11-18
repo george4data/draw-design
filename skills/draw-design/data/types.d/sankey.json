@@ -1,0 +1,15 @@
+{
+  "slug": "sankey",
+  "name": "Sankey",
+  "family": "charts",
+  "grammar": "bespoke",
+  "wave": 4,
+  "status": "planned",
+  "feasibility": "hard",
+  "budget": {
+    "nodes": 8,
+    "edges": 12
+  },
+  "reference": "references/type-sankey.md",
+  "example": "examples/sankey.dd.json"
+}

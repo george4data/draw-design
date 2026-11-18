@@ -1,0 +1,14 @@
+{
+  "slug": "scatter",
+  "name": "Scatter plot",
+  "family": "charts",
+  "grammar": "axes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "points": 30
+  },
+  "reference": "references/type-scatter.md",
+  "example": "examples/scatter.dd.json"
+}

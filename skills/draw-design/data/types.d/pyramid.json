@@ -1,0 +1,14 @@
+{
+  "slug": "pyramid",
+  "name": "Pyramid / funnel",
+  "family": "strategy",
+  "grammar": "bands",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "layers": 6
+  },
+  "reference": "references/type-pyramid.md",
+  "example": "examples/pyramid.dd.json"
+}

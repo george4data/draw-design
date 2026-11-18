@@ -1,0 +1,14 @@
+{
+  "slug": "line",
+  "name": "Line chart",
+  "family": "charts",
+  "grammar": "axes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "series": 5
+  },
+  "reference": "references/type-line.md",
+  "example": "examples/line.dd.json"
+}

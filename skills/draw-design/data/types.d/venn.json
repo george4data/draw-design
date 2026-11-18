@@ -1,0 +1,14 @@
+{
+  "slug": "venn",
+  "name": "Venn",
+  "family": "strategy",
+  "grammar": "radial",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "circles": 3
+  },
+  "reference": "references/type-venn.md",
+  "example": "examples/venn.dd.json"
+}

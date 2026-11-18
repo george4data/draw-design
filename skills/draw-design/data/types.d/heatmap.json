@@ -1,0 +1,12 @@
+{
+  "slug": "heatmap",
+  "name": "Heatmap",
+  "family": "charts",
+  "grammar": "grid",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {},
+  "reference": "references/type-heatmap.md",
+  "example": "examples/heatmap.dd.json"
+}

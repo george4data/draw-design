@@ -1,0 +1,126 @@
+{
+  "presets": {
+    "doc-inline": {
+      "width": 960,
+      "height": 600,
+      "ramp": "standard",
+      "safe": 40
+    },
+    "doc-wide": {
+      "width": 1280,
+      "height": 720,
+      "ramp": "standard",
+      "safe": 40
+    },
+    "slide-16x9": {
+      "width": 1280,
+      "height": 720,
+      "ramp": "presentation",
+      "safe": 40
+    },
+    "slide-4x3": {
+      "width": 1024,
+      "height": 768,
+      "ramp": "presentation",
+      "safe": 40
+    },
+    "social-og": {
+      "width": 1200,
+      "height": 632,
+      "ramp": "presentation",
+      "safe": 64
+    },
+    "social-square": {
+      "width": 1080,
+      "height": 1080,
+      "ramp": "presentation",
+      "safe": 40
+    },
+    "print-a4-landscape": {
+      "width": 1120,
+      "height": 792,
+      "ramp": "print",
+      "safe": 40
+    },
+    "print-a3-landscape": {
+      "width": 1584,
+      "height": 1120,
+      "ramp": "print",
+      "safe": 40
+    },
+    "print-letter-landscape": {
+      "width": 1056,
+      "height": 816,
+      "ramp": "print",
+      "safe": 40
+    },
+    "fit": {
+      "width": 0,
+      "height": 0,
+      "ramp": "standard",
+      "safe": 40
+    }
+  },
+  "ramps": {
+    "standard": {
+      "title": 28,
+      "node": 12,
+      "sublabel": 9,
+      "arrow": 8,
+      "eyebrow": 8,
+      "minNodeHeight": 48,
+      "minGap": 24
+    },
+    "presentation": {
+      "title": 40,
+      "node": 16,
+      "sublabel": 12,
+      "arrow": 12,
+      "eyebrow": 8,
+      "minNodeHeight": 64,
+      "minGap": 40
+    },
+    "print": {
+      "title": 32,
+      "node": 12,
+      "sublabel": 9,
+      "arrow": 8,
+      "eyebrow": 8,
+      "minNodeHeight": 48,
+      "minGap": 24
+    }
+  },
+  "legendStrip": 44,
+  "nodeWidths": [
+    80,
+    96,
+    112,
+    120,
+    128,
+    144,
+    160,
+    200,
+    240,
+    320
+  ],
+  "nodeHeights": [
+    48,
+    56,
+    64,
+    72,
+    80,
+    96
+  ],
+  "gaps": [
+    20,
+    24,
+    32,
+    40,
+    48
+  ],
+  "padding": [
+    8,
+    12,
+    16
+  ]
+}

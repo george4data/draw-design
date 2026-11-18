@@ -1,0 +1,24 @@
+{
+  "name": "draw-design",
+  "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence, state machines, ER, swimlanes, org charts, trees, layer stacks and nested scopes, with AWS, GCP, Azure and Kubernetes icons. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop.",
+  "version": "0.1.0",
+  "author": {
+    "name": "George Pulinattu"
+  },
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "drawio",
+    "diagrams.net",
+    "architecture",
+    "flowchart",
+    "sequence",
+    "editable",
+    "brand",
+    "aws",
+    "gcp",
+    "azure",
+    "kubernetes",
+    "export"
+  ]
+}

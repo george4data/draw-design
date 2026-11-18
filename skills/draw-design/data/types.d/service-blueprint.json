@@ -1,0 +1,14 @@
+{
+  "slug": "service-blueprint",
+  "name": "Service blueprint",
+  "family": "process",
+  "grammar": "lanes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "stages": 6
+  },
+  "reference": "references/type-service-blueprint.md",
+  "example": "examples/service-blueprint.dd.json"
+}

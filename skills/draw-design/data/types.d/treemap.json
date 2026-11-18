@@ -1,0 +1,14 @@
+{
+  "slug": "treemap",
+  "name": "Treemap",
+  "family": "charts",
+  "grammar": "grid",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "cells": 8
+  },
+  "reference": "references/type-treemap.md",
+  "example": "examples/treemap.dd.json"
+}

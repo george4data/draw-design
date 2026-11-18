@@ -1,0 +1,50 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.10", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install -r requirements-dev.txt
+      - run: python -m ruff check skills/draw-design/scripts tests scripts
+      - run: python -m mypy
+      - run: python -m pytest
+        env:
+          PYTHONPATH: skills/draw-design/scripts
+      - run: python scripts/gen-docs.py --check
+      - run: python scripts/verify-plugin-package.py
+  render:
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Install draw.io Desktop and xvfb
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xvfb libgbm1 libasound2t64 wget
+          wget -q -O drawio.deb "https://github.com/jgraph/drawio-desktop/releases/download/v32.7.4/drawio-amd64-32.7.4.deb"
+          sudo apt-get install -y ./drawio.deb
+      - run: python scripts/build-gallery.py --render
+        env:
+          PYTHONPATH: skills/draw-design/scripts
+          DRAWIO_CLI: /opt/drawio/drawio
+      - uses: actions/upload-artifact@v4
+        with:
+          name: gallery
+          path: gallery/

@@ -1,0 +1,38 @@
+{
+  "slug": "architecture",
+  "name": "Architecture",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 1,
+  "status": "shipped",
+  "feasibility": "easy",
+  "budget": {
+    "nodes": 9,
+    "edges": 12,
+    "zones": 3,
+    "accent": 2
+  },
+  "reference": "references/type-architecture.md",
+  "example": "examples/architecture.dd.json",
+  "roles": [
+    "backend",
+    "store",
+    "external",
+    "input",
+    "optional",
+    "security"
+  ],
+  "directions": [
+    "LR",
+    "TB"
+  ],
+  "defaultDirection": "LR",
+  "aliases": [
+    "architecture diagram",
+    "system diagram",
+    "component diagram",
+    "infrastructure diagram",
+    "topology"
+  ],
+  "useWhen": "Components and connections in one snapshot; tiers or trust boundaries as zones."
+}

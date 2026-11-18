@@ -1,0 +1,14 @@
+{
+  "slug": "sequence",
+  "name": "Sequence",
+  "family": "process",
+  "grammar": "lifelines",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "lifelines": 5
+  },
+  "reference": "references/type-sequence.md",
+  "example": "examples/sequence.dd.json"
+}

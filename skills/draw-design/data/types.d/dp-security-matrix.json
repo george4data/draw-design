@@ -1,0 +1,12 @@
+{
+  "slug": "dp-security-matrix",
+  "name": "DP security matrix",
+  "family": "data",
+  "grammar": "grid",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {},
+  "reference": "references/type-dp-security-matrix.md",
+  "example": "examples/dp-security-matrix.dd.json"
+}

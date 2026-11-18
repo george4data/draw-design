@@ -1,0 +1,15 @@
+{
+  "slug": "db-schema",
+  "name": "Database schema",
+  "family": "data",
+  "grammar": "layered",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "nodes": 5,
+    "edges": 6
+  },
+  "reference": "references/type-db-schema.md",
+  "example": "examples/db-schema.dd.json"
+}

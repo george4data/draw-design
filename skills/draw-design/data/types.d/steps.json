@@ -1,0 +1,14 @@
+{
+  "slug": "steps",
+  "name": "Steps",
+  "family": "process",
+  "grammar": "bands",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "stages": 7
+  },
+  "reference": "references/type-steps.md",
+  "example": "examples/steps.dd.json"
+}

@@ -1,0 +1,15 @@
+{
+  "slug": "kanban",
+  "name": "Kanban",
+  "family": "time",
+  "grammar": "bands",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "columns": 5,
+    "cards": 12
+  },
+  "reference": "references/type-kanban.md",
+  "example": "examples/kanban.dd.json"
+}

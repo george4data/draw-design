@@ -1,0 +1,14 @@
+{
+  "slug": "layers",
+  "name": "Layer stack",
+  "family": "structural",
+  "grammar": "bands",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "layers": 6
+  },
+  "reference": "references/type-layers.md",
+  "example": "examples/layers.dd.json"
+}

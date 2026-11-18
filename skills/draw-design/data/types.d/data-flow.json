@@ -1,0 +1,15 @@
+{
+  "slug": "data-flow",
+  "name": "Data flow",
+  "family": "process",
+  "grammar": "lanes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "lanes": 4,
+    "steps": 6
+  },
+  "reference": "references/type-data-flow.md",
+  "example": "examples/data-flow.dd.json"
+}

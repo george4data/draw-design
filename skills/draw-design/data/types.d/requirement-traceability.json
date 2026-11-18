@@ -1,0 +1,14 @@
+{
+  "slug": "requirement-traceability",
+  "name": "Requirement traceability",
+  "family": "data",
+  "grammar": "grid",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "rows": 6
+  },
+  "reference": "references/type-requirement-traceability.md",
+  "example": "examples/requirement-traceability.dd.json"
+}

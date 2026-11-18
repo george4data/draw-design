@@ -1,0 +1,14 @@
+{
+  "slug": "er",
+  "name": "ER / data model",
+  "family": "data",
+  "grammar": "layered",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "entities": 8
+  },
+  "reference": "references/type-er.md",
+  "example": "examples/er.dd.json"
+}

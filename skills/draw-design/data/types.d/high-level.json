@@ -1,0 +1,12 @@
+{
+  "slug": "high-level",
+  "name": "High-level",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {},
+  "reference": "references/type-high-level.md",
+  "example": "examples/high-level.dd.json"
+}

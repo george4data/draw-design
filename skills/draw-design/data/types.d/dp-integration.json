@@ -1,0 +1,14 @@
+{
+  "slug": "dp-integration",
+  "name": "DP integration",
+  "family": "structural",
+  "grammar": "layered",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "nodes": 20
+  },
+  "reference": "references/type-dp-integration.md",
+  "example": "examples/dp-integration.dd.json"
+}

@@ -1,0 +1,42 @@
+{
+  "name": "draw-design",
+  "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence, state machines, ER, swimlanes, org charts, trees, layer stacks and nested scopes, with AWS, GCP, Azure and Kubernetes icons. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop.",
+  "version": "0.1.0",
+  "author": {
+    "name": "George Pulinattu"
+  },
+  "license": "MIT",
+  "keywords": [
+    "diagrams",
+    "drawio",
+    "diagrams.net",
+    "architecture",
+    "flowchart",
+    "sequence",
+    "editable",
+    "brand",
+    "aws",
+    "gcp",
+    "azure",
+    "kubernetes",
+    "export"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Draw Design",
+    "shortDescription": "Create editable, on-brand draw.io diagrams",
+    "longDescription": "Draw Design turns a description of your system, process or data into an editorial-quality draw.io diagram in your brand. The agent writes a compact Diagram Spec; the ddraw compiler lays it out on a 4px grid, routes orthogonal connectors, applies your theme and lints the result. Output is a native .drawio file you can keep editing, with PNG, SVG and PDF export through draw.io Desktop.\n\nShipped diagram types: architecture, flowchart.",
+    "developerName": "George Pulinattu",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Make an architecture diagram of this repo as a draw.io file.",
+      "Draw a flowchart of this decision process in draw.io.",
+      "Export this diagram as PNG."
+    ],
+    "brandColor": "#bf4520"
+  }
+}

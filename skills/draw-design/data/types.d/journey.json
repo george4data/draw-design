@@ -1,0 +1,14 @@
+{
+  "slug": "journey",
+  "name": "User journey",
+  "family": "process",
+  "grammar": "lanes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "stages": 6
+  },
+  "reference": "references/type-journey.md",
+  "example": "examples/journey.dd.json"
+}

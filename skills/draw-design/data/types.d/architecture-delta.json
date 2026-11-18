@@ -1,0 +1,15 @@
+{
+  "slug": "architecture-delta",
+  "name": "Architecture delta",
+  "family": "structural",
+  "grammar": "bespoke",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "nodes": 8,
+    "edges": 10
+  },
+  "reference": "references/type-architecture-delta.md",
+  "example": "examples/architecture-delta.dd.json"
+}

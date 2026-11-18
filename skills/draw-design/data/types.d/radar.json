@@ -1,0 +1,15 @@
+{
+  "slug": "radar",
+  "name": "Radar / spider",
+  "family": "charts",
+  "grammar": "radial",
+  "wave": 4,
+  "status": "planned",
+  "feasibility": "hard",
+  "budget": {
+    "axes": 5,
+    "series": 5
+  },
+  "reference": "references/type-radar.md",
+  "example": "examples/radar.dd.json"
+}

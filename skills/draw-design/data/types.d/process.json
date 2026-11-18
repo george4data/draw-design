@@ -1,0 +1,15 @@
+{
+  "slug": "process",
+  "name": "Process",
+  "family": "process",
+  "grammar": "lanes",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "lanes": 6,
+    "steps": 12
+  },
+  "reference": "references/type-process.md",
+  "example": "examples/process.dd.json"
+}

@@ -1,0 +1,12 @@
+{
+  "slug": "timeline",
+  "name": "Timeline",
+  "family": "time",
+  "grammar": "time",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {},
+  "reference": "references/type-timeline.md",
+  "example": "examples/timeline.dd.json"
+}

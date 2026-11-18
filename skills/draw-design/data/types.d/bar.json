@@ -1,0 +1,14 @@
+{
+  "slug": "bar",
+  "name": "Bar chart",
+  "family": "charts",
+  "grammar": "axes",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "bars": 8
+  },
+  "reference": "references/type-bar.md",
+  "example": "examples/bar.dd.json"
+}

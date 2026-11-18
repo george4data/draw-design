@@ -1,0 +1,67 @@
+{
+  "ddVersion": 1,
+  "type": "flowchart",
+  "title": "Refund approval",
+  "description": "A refund request is checked against the order age and amount; small recent refunds are approved automatically, others go to a reviewer.",
+  "size": "doc-inline",
+  "nodes": [
+    {
+      "id": "start",
+      "label": "Refund requested",
+      "role": "start"
+    },
+    {
+      "id": "age",
+      "label": "Within 30 days?",
+      "role": "decision"
+    },
+    {
+      "id": "amount",
+      "label": "Under $100?",
+      "role": "decision"
+    },
+    {
+      "id": "auto",
+      "label": "Auto-approve",
+      "sublabel": "refund-svc",
+      "focal": true
+    },
+    {
+      "id": "review",
+      "label": "Manual review",
+      "sublabel": "support queue"
+    },
+    {
+      "id": "deny",
+      "label": "Deny with reason",
+      "role": "end"
+    }
+  ],
+  "edges": [
+    {
+      "from": "start",
+      "to": "age"
+    },
+    {
+      "from": "age",
+      "to": "amount",
+      "label": "YES"
+    },
+    {
+      "from": "age",
+      "to": "deny",
+      "label": "NO"
+    },
+    {
+      "from": "amount",
+      "to": "auto",
+      "label": "YES",
+      "kind": "accent"
+    },
+    {
+      "from": "amount",
+      "to": "review",
+      "label": "NO"
+    }
+  ]
+}

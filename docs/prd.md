@@ -2304,7 +2304,7 @@ flowchart LR
 | OQ-01 | Final product name (`draw-design` vs alternatives) | `draw-design` |
 | OQ-02 | Minimum supported draw.io Desktop version for export | Latest stable at M2 minus 2 majors (record in ADR) |
 | OQ-03 | Does the current Codex plugin format support bundled slash commands/prompts? | Assume no; NL routes |
-| OQ-04 | Use draw.io adaptive/dark-mode colours, or compile separate dark pages? | **Proposed resolution:** `light-dark()` colours + `adaptiveColors="none"` (FR-021), `both` variant for old renderers. Confirm the minimum version in T-1.3 |
+| OQ-04 | Use draw.io adaptive/dark-mode colours, or compile separate dark pages? | **Resolved (ADR 0010):** light variant = `light-dark()` pairs; dark variant = fixed dark hex. Original proposal: `light-dark()` colours + `adaptiveColors="none"` (FR-021), `both` variant for old renderers. Confirm the minimum version in T-1.3 |
 | OQ-10 | Reuse jgraph's Apache-2.0 assets (XSD, shape index, style reference) or stay self-contained? | Vendor the XSD for tests only; shape index optional for P2 icon mapping |
 | OQ-11 | Offer ELK (via the desktop CLI) as the default engine for graph types when available? | No: in-house engines stay the default for determinism; ELK is opt-in (FR-066) |
 | OQ-12 | Which non-cloud libraries to catalogue at P0 vs later (Cisco, IBM, network, BPMN, C4, mockups)? | P0: aws4, aws3d, gcp2, gcp3, azure2, kubernetes; P1: cisco19, ibm, networks2, c4; others on request |

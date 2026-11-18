@@ -1,0 +1,15 @@
+{
+  "name": "draw-design",
+  "owner": {
+    "name": "George Pulinattu"
+  },
+  "metadata": {
+    "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence, state machines, ER, swimlanes, org charts, trees, layer stacks and nested scopes, with AWS, GCP, Azure and Kubernetes icons. Lints every diagram against editorial rules and exports PNG, SVG and PDF through draw.io Desktop."
+  },
+  "plugins": [
+    {
+      "name": "draw-design",
+      "source": "./"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "gantt",
+  "name": "Gantt",
+  "family": "time",
+  "grammar": "time",
+  "wave": 2,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "tasks": 12
+  },
+  "reference": "references/type-gantt.md",
+  "example": "examples/gantt.dd.json"
+}

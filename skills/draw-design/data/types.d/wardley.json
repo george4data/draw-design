@@ -1,0 +1,14 @@
+{
+  "slug": "wardley",
+  "name": "Wardley map",
+  "family": "strategy",
+  "grammar": "axes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "edges": 12
+  },
+  "reference": "references/type-wardley.md",
+  "example": "examples/wardley.dd.json"
+}

@@ -1,0 +1,14 @@
+{
+  "slug": "waterfall",
+  "name": "Waterfall",
+  "family": "charts",
+  "grammar": "axes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "bars": 8
+  },
+  "reference": "references/type-waterfall.md",
+  "example": "examples/waterfall.dd.json"
+}

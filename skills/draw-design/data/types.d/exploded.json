@@ -1,0 +1,14 @@
+{
+  "slug": "exploded",
+  "name": "Exploded axonometric",
+  "family": "spatial",
+  "grammar": "projection",
+  "wave": 4,
+  "status": "planned",
+  "feasibility": "hard",
+  "budget": {
+    "parts": 5
+  },
+  "reference": "references/type-exploded.md",
+  "example": "examples/exploded.dd.json"
+}

@@ -1,0 +1,20 @@
+{
+  "name": "draw-design",
+  "interface": {
+    "displayName": "Draw Design"
+  },
+  "plugins": [
+    {
+      "name": "draw-design",
+      "source": {
+        "source": "local",
+        "path": "./"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

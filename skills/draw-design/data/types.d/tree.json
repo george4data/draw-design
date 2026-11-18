@@ -1,0 +1,14 @@
+{
+  "slug": "tree",
+  "name": "Tree",
+  "family": "structural",
+  "grammar": "tree",
+  "wave": 1,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "depth": 4
+  },
+  "reference": "references/type-tree.md",
+  "example": "examples/tree.dd.json"
+}

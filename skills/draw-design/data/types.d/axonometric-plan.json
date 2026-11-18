@@ -1,0 +1,14 @@
+{
+  "slug": "axonometric-plan",
+  "name": "Axonometric plan",
+  "family": "spatial",
+  "grammar": "projection",
+  "wave": 4,
+  "status": "planned",
+  "feasibility": "hard",
+  "budget": {
+    "tags": 8
+  },
+  "reference": "references/type-axonometric-plan.md",
+  "example": "examples/axonometric-plan.dd.json"
+}

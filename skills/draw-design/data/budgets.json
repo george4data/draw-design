@@ -1,0 +1,8 @@
+{
+  "universal": { "nodes": 9, "edges": 12, "accent": 2, "callouts": 2 },
+  "detail": {
+    "faithful":   { "nodes": 24, "edges": 32 },
+    "balanced":   { "nodes": 12, "edges": 16 },
+    "simplified": { "nodes": 7,  "edges": 9 }
+  }
+}

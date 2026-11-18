@@ -1,0 +1,14 @@
+{
+  "slug": "loop",
+  "name": "Loop / flywheel",
+  "family": "process",
+  "grammar": "radial",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "stations": 8
+  },
+  "reference": "references/type-loop.md",
+  "example": "examples/loop.dd.json"
+}

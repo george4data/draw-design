@@ -1,0 +1,14 @@
+{
+  "slug": "story-map",
+  "name": "Story map",
+  "family": "time",
+  "grammar": "lanes",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "easy",
+  "budget": {
+    "cards": 12
+  },
+  "reference": "references/type-story-map.md",
+  "example": "examples/story-map.dd.json"
+}

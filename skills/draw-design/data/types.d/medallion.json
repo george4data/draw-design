@@ -1,0 +1,14 @@
+{
+  "slug": "medallion",
+  "name": "Medallion",
+  "family": "data",
+  "grammar": "bands",
+  "wave": 3,
+  "status": "planned",
+  "feasibility": "medium",
+  "budget": {
+    "tiers": 6
+  },
+  "reference": "references/type-medallion.md",
+  "example": "examples/medallion.dd.json"
+}
