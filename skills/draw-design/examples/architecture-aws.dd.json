@@ -1,0 +1,116 @@
+{
+  "ddVersion": 1,
+  "type": "architecture",
+  "title": "Checkout on AWS",
+  "description": "Web and mobile clients call API Gateway, which routes to the order service on Fargate and the payment function on Lambda; both persist to Aurora, and payments charge Stripe.",
+  "size": "doc-inline",
+  "direction": "LR",
+  "zones": [
+    {
+      "id": "clients",
+      "label": "Clients"
+    },
+    {
+      "id": "core",
+      "label": "Core services"
+    },
+    {
+      "id": "data",
+      "label": "Data"
+    }
+  ],
+  "nodes": [
+    {
+      "id": "web",
+      "label": "Web App",
+      "sublabel": "next.js",
+      "role": "input",
+      "zone": "clients",
+      "icon": "aws4:client"
+    },
+    {
+      "id": "mobile",
+      "label": "Mobile App",
+      "sublabel": "swift",
+      "role": "input",
+      "zone": "clients",
+      "icon": "aws4:mobile_client"
+    },
+    {
+      "id": "gw",
+      "label": "API Gateway",
+      "sublabel": "REST · :443",
+      "zone": "core",
+      "focal": true,
+      "icon": "aws4:api_gateway"
+    },
+    {
+      "id": "orders",
+      "label": "Orders",
+      "sublabel": "Fargate",
+      "zone": "core",
+      "icon": "aws4:fargate"
+    },
+    {
+      "id": "pay",
+      "label": "Payments",
+      "sublabel": "Lambda",
+      "zone": "core",
+      "icon": "aws4:lambda"
+    },
+    {
+      "id": "db",
+      "label": "Aurora",
+      "sublabel": "postgres",
+      "role": "store",
+      "zone": "data",
+      "icon": "aws4:aurora"
+    },
+    {
+      "id": "stripe",
+      "label": "Stripe",
+      "sublabel": "payments API",
+      "role": "external",
+      "tag": "EXT"
+    }
+  ],
+  "edges": [
+    {
+      "from": "web",
+      "to": "gw",
+      "label": "HTTPS",
+      "kind": "link"
+    },
+    {
+      "from": "mobile",
+      "to": "gw",
+      "label": "HTTPS",
+      "kind": "link"
+    },
+    {
+      "from": "gw",
+      "to": "orders",
+      "kind": "accent"
+    },
+    {
+      "from": "gw",
+      "to": "pay"
+    },
+    {
+      "from": "orders",
+      "to": "db",
+      "label": "SQL"
+    },
+    {
+      "from": "pay",
+      "to": "db",
+      "label": "SQL"
+    },
+    {
+      "from": "pay",
+      "to": "stripe",
+      "label": "CHARGE",
+      "kind": "link"
+    }
+  ]
+}

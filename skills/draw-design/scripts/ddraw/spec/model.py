@@ -97,6 +97,7 @@ def _sequence_parts(seq: dict[str, Any]) -> tuple[list[Node], list[Edge]]:
             sublabel=p.get("sublabel", ""),
             role=p.get("role", "service"),
             focal=bool(p.get("focal", False)),
+            icon=p.get("icon", ""),
             index=i,
         )
         for i, p in enumerate(seq.get("participants", []))

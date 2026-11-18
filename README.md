@@ -17,6 +17,7 @@ PNG, SVG and PDF exports go through the draw.io Desktop command line.
 | ![Architecture](gallery/png/architecture.png) | ![Sequence](gallery/png/sequence.png) |
 | ![Flowchart](gallery/png/flowchart.png) | ![Swimlane](gallery/png/swimlane.png) |
 | ![State machine](gallery/png/state.png) | ![Org chart](gallery/png/org-chart.png) |
+| ![AWS architecture with vendor icons](gallery/png/architecture-aws.png) | |
 
 > Status: early development (v0.1). See [`docs/prd.md`](docs/prd.md) for the full spec and roadmap, and its §22.10 for what is implemented.
 
@@ -25,6 +26,7 @@ PNG, SVG and PDF exports go through the draw.io Desktop command line.
 | Capability | Command |
 |---|---|
 | 8 diagram types: architecture, flowchart, sequence, swimlane, state machine, tree, org chart, layer stack | `ddraw build spec.dd.json` |
+| Official AWS, Google Cloud, Azure and Kubernetes icons (about 2,000, verified to render in draw.io, offline), in vendor colours or monochrome | `ddraw icons search "sqs queue" --platform aws`, then `"icon": "aws4:sqs"` |
 | Validated spec with JSON-pointer errors and "did you mean" fixes | `ddraw validate`, `ddraw new <type>` |
 | Editorial lint of any draw.io file (structure, 4px grid, budgets, connector rules, palette, fonts, legend, unsafe links) | `ddraw lint file.drawio` |
 | Export PNG / SVG / PDF / editable `.drawio.png` / `.drawio.svg`, with accessible SVG titles | `ddraw export file.drawio --format png` |

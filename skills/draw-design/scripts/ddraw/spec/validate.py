@@ -216,6 +216,7 @@ def semantic(spec: Spec) -> list[Finding]:
                 pointer="/zones",
             )
         )
+    out += _icon_checks(spec, info)
     if spec.type == "flowchart":
         for n in spec.nodes:
             if n.role == "decision":
@@ -238,6 +239,126 @@ def semantic(spec: Spec) -> list[Finding]:
                                 fix="label every exit, e.g. YES / NO",
                             )
                         )
+    return out
+
+
+ICON_EXEMPT_ROLES = {"external", "input", "actor"}
+
+
+def _icon_checks(spec: Spec, info: registry.TypeInfo) -> list[Finding]:
+    """Vendor icon ids, family discipline and placement rules (PRD §10.8, LR-I001–I005)."""
+    from ddraw.icons import catalog
+
+    out: list[Finding] = []
+    base = "/sequence/participants" if spec.type == "sequence" else "/nodes"
+    for i, z in enumerate(spec.zones):
+        if z.icon:
+            out.append(
+                Finding(
+                    "SPEC-031",
+                    "zone icons (vendor group containers such as an AWS VPC) are planned, not built yet",
+                    pointer=f"/zones/{i}/icon",
+                    fix="remove the zone icon; the zone keeps its editorial style",
+                )
+            )
+    used = [n for n in spec.nodes if n.icon]
+    if not used:
+        if spec.icon_style:
+            out.append(
+                Finding(
+                    "SPEC-033",
+                    "iconStyle has no effect without node icons",
+                    severity="warn",
+                    pointer="/iconStyle",
+                )
+            )
+        return out
+    if not info.icons:
+        typed = ", ".join(t.slug for t in registry.shipped() if t.icons)
+        return [
+            *out,
+            Finding(
+                "SPEC-030",
+                f"{spec.type} diagrams do not use icons",
+                pointer=f"{base}/{used[0].index}/icon",
+                fix=f"remove the icons; they are for {typed}",
+            ),
+        ]
+    fams = catalog.families()
+    by_platform: dict[str, set[str]] = {}
+    used_families: set[str] = set()
+    for n in used:
+        ptr = f"{base}/{n.index}/icon"
+        entry = catalog.lookup(n.icon)
+        if entry is None:
+            if ":" not in n.icon:
+                fix = "generic bundled icons are planned; use a vendor id from `ddraw icons search`"
+            else:
+                close = catalog.suggest(n.icon)
+                fix = (
+                    f"did you mean {' or '.join(close)}?"
+                    if close
+                    else "find the id with `ddraw icons search`"
+                )
+            out.append(Finding("LR-I001", f"unknown icon {n.icon!r}", pointer=ptr, fix=fix))
+            continue
+        if entry.kind != "icon":
+            out.append(
+                Finding(
+                    "LR-I001",
+                    f"{n.icon!r} is a group container, not a node icon",
+                    pointer=ptr,
+                    fix="use a service icon; group containers for zones are planned",
+                )
+            )
+            continue
+        if n.tag:
+            out.append(
+                Finding(
+                    "SPEC-032",
+                    f"node {n.id!r} has both a tag and an icon; the tag is not drawn",
+                    pointer=f"{base}/{n.index}/tag",
+                    severity="warn",
+                    fix="drop the tag; the icon already says what kind of service it is",
+                )
+            )
+        by_platform.setdefault(fams[entry.family].platform, set()).add(entry.family)
+        used_families.add(entry.family)
+    for platform, fs in sorted(by_platform.items()):
+        if len(fs) > 1:
+            out.append(
+                Finding(
+                    "LR-I002",
+                    f"{platform} icons mix families {', '.join(sorted(fs))}; their styles clash",
+                    pointer=base,
+                    severity="warn",
+                    fix="use one family per platform (`ddraw icons search --family <one>`)",
+                )
+            )
+    if spec.icon_style == "mono":
+        fixed = sorted(f for f in used_families if fams[f].recolor == "none")
+        if fixed:
+            out.append(
+                Finding(
+                    "LR-I004",
+                    f"iconStyle mono cannot recolour {', '.join(fixed)}; those icons keep vendor colours",
+                    pointer="/iconStyle",
+                    severity="warn",
+                    fix="use iconStyle vendor, or icons from a recolourable family (aws4, kubernetes)",
+                )
+            )
+    comparable = [n for n in spec.nodes if n.role not in ICON_EXEMPT_ROLES]
+    bare = [n.id for n in comparable if not n.icon]
+    if bare and any(n.icon for n in comparable):
+        out.append(
+            Finding(
+                "LR-I005",
+                f"some services have icons and some do not ({', '.join(bare)})",
+                pointer=base,
+                severity="warn",
+                fix="give every service an icon or none (externals, clients and actors are exempt)",
+            )
+        )
     return out
 
 

@@ -494,6 +494,10 @@
               },
               "focal": {
                 "type": "boolean"
+              },
+              "icon": {
+                "type": "string",
+                "pattern": "^[a-z0-9][a-z0-9_.:-]{0,80}$"
               }
             }
           }

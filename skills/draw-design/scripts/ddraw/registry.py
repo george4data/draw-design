@@ -30,6 +30,7 @@ class TypeInfo:
     self_loops: bool = False
     routing: str = "orthogonal"  # orthogonal | bus
     legend_backend: str = "SERVICE"
+    icons: bool = False  # nodes may carry vendor icons (PRD §10.8.5 rule 1)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -75,6 +76,7 @@ def types() -> dict[str, TypeInfo]:
             self_loops=bool(raw.get("selfLoops", False)),
             routing=str(raw.get("routing", "orthogonal")),
             legend_backend=str(raw.get("legendBackend", "SERVICE")),
+            icons=bool(raw.get("icons", False)),
             budget={k: int(v) for k, v in raw.get("budget", {}).items()},
         )
         if info.slug != path.stem:

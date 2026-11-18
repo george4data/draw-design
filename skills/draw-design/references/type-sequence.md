@@ -31,7 +31,7 @@ Sequence diagrams use a `sequence` block **instead of** `nodes`/`edges`:
 }
 ```
 
-- `participants`, left to right in reading order. `role`: `actor` (people, browsers), `service` (default), `store`, `external`. `focal: true` accents a participant.
+- `participants`, left to right in reading order. `role`: `actor` (people, browsers), `service` (default), `store`, `external`. `focal: true` accents a participant. `icon` (e.g. `gcp:cloud_run`) shows the vendor icon in the header: give one to every service participant or none; see [icons.md](icons.md).
 - `messages`, in time order. `kind`: `sync` (default: solid line, filled arrow; starts an activation bar on the receiver), `return` (dashed, filled arrow; ends the receiver's activation), `async` (dashed, open arrow). `from` = `to` draws a self-message loop. `focal: true` draws the headline message in the accent colour. Labels ≤ 24 chars and keep their case (`POST /token`, `200 profile`).
 - `fragments` wrap a range of messages, **numbered from 1**: `opt` (optional), `loop`, `alt` (with `elseAt` = the first message of the else region and `elseLabel`). `label` is the guard, shown as `[guard]`. Fragments nest or are disjoint; at most 1 nesting level.
 

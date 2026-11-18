@@ -36,5 +36,6 @@
     "call flow",
     "request flow"
   ],
-  "useWhen": "Time-ordered messages between a few actors and services (calls, returns, async events)."
+  "useWhen": "Time-ordered messages between a few actors and services (calls, returns, async events).",
+  "icons": true
 }

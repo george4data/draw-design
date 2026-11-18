@@ -166,6 +166,59 @@ def cmd_doctor(a: argparse.Namespace) -> int:
     return code
 
 
+def cmd_icons(a: argparse.Namespace) -> int:
+    from ddraw.icons import catalog
+
+    fams = catalog.families()
+    if a.verb == "families":
+        rows = [f.to_dict() for f in fams.values() if not a.platform or f.platform == a.platform]
+        if a.json:
+            payload = {
+                "verifiedWith": catalog.verified_with(),
+                "preferred": catalog.meta().get("preferred", {}),
+            }
+            print(json.dumps({**payload, "families": rows}, indent=2))
+        else:
+            for r in rows:
+                flag = "current" if r["current"] else "legacy "
+                mono = "mono ok" if r["recolor"] != "none" else "vendor colours only"
+                print(f"{r['family']:11} {r['platform']:11} {flag} {r['count']:5}  {r['title']} ({mono})")
+            _err(f"verified with draw.io {catalog.verified_with() or 'unknown'}")
+        return EXIT_OK
+    words = " ".join(a.query).strip()
+    if not words:
+        _err(f"ddraw icons {a.verb} needs {'an id' if a.verb == 'show' else 'search words'}")
+        return EXIT_USAGE
+    if a.verb == "show":
+        entry = catalog.lookup(words)
+        if entry is None:
+            close = catalog.suggest(words)
+            _err(f"unknown icon {words!r}" + (f"; did you mean {' or '.join(close)}?" if close else ""))
+            return EXIT_FINDINGS
+        fam = fams[entry.family]
+        info = {**entry.to_dict(with_style=True), "platform": fam.platform, "recolor": fam.recolor}
+        print(json.dumps(info, indent=2) if a.json else f"{entry.id}  {entry.title}  ({fam.title})")
+        return EXIT_OK
+    if a.family and a.family not in fams:
+        _err(f"unknown family {a.family!r}; one of {', '.join(fams)}")
+        return EXIT_USAGE
+    hits = catalog.search(
+        words,
+        platform=a.platform or "",
+        family=a.family or "",
+        kind="group" if a.groups else "icon",
+        limit=a.limit,
+    )
+    if a.json:
+        print(json.dumps([{**e.to_dict(), "family": e.family} for e in hits], indent=2))
+    else:
+        for e in hits:
+            print(f"{e.id:44} {e.title}")
+        if not hits:
+            _err("no match; try fewer or more general words, or another --platform")
+    return EXIT_OK
+
+
 def cmd_theme(a: argparse.Namespace) -> int:
     from ddraw.theme.contrast import check, report
     from ddraw.theme.model import load_theme
@@ -372,6 +425,16 @@ def parser() -> argparse.ArgumentParser:
     pr.add_argument("--json", action="store_true")
     pr.set_defaults(fn=cmd_profile)
 
+    ic = sub.add_parser("icons", help="search the vendor icon catalog (AWS, GCP, Azure, Kubernetes)")
+    ic.add_argument("verb", choices=["families", "search", "show"])
+    ic.add_argument("query", nargs="*", help="search words, or an icon id for `show`")
+    ic.add_argument("--platform", choices=["aws", "gcp", "azure", "kubernetes"])
+    ic.add_argument("--family", help="limit to one family, e.g. aws4 or gcp")
+    ic.add_argument("--groups", action="store_true", help="search group containers instead of icons")
+    ic.add_argument("--limit", type=int, default=8)
+    ic.add_argument("--json", action="store_true")
+    ic.set_defaults(fn=cmd_icons)
+
     im = sub.add_parser("import", help="restyle an existing draw.io file to the theme (redraw planned)")
     im.add_argument("src")
     im.add_argument("--mode", choices=["restyle", "redraw"], default="restyle")
@@ -386,7 +449,6 @@ def parser() -> argparse.ArgumentParser:
 
     for name, helptext in (
         ("digest", "import digest"),
-        ("icons", "icon catalog"),
         ("library", "brand library"),
         ("sync", "round-trip edits"),
         ("registry", "block registry"),

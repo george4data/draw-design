@@ -661,7 +661,7 @@ draw-design/
 │       │   ├── import-drawio.md · import-mermaid.md · import-plantuml.md · import-excalidraw.md
 │       │   ├── export.md
 │       │   ├── doctor.md
-│       │   ├── primitive-annotation.md · primitive-icons.md · primitive-sketchy.md
+│       │   ├── primitive-annotation.md · icons.md · primitive-sketchy.md
 │       │   └── type-<slug>.md      # one per visual type (§12)
 │       ├── themes/
 │       │   ├── default.json        # shipped default theme (one light palette)
@@ -1093,11 +1093,14 @@ There is no light/dark variant: diagrams have one light palette (ADR 0011). With
 
 #### 10.8.1 Key fact: draw.io already ships every vendor library
 
+> **Implementation status (ADR 0012):** the catalog, `ddraw icons`, node icons inside boxes (`architecture`, `sequence`), `iconStyle` and LR-I001/I002/I004/I005/I007 are built. Verified facts and deviations from the original plan below are marked *ADR 0012*.
+
 draw.io Desktop, diagrams.net, Confluence/Jira draw.io and the VS Code extension all **bundle** their shape libraries (AWS, AWS 3D, Azure, GCP, GCP 2026, Kubernetes, Cisco, IBM, …). The *More Shapes* dialog in the editor only chooses which libraries appear **in the user's sidebar**. That is a per-user UI preference, not part of the diagram. A `.drawio` file references a shape by its style string (e.g. `shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;`), and draw.io renders it whether or not that library is ticked, including in CLI export.
 
 Consequences (MUST):
 
 - **FR-130** The skill never asks the user to enable libraries and never downloads draw.io shapes at runtime. Vendor icons are emitted as **native stencil references**: offline, tiny, and swappable by humans in the editor.
+- **FR-130a** *ADR 0012:* library images such as `img/lib/azure2/*.svg` are paths inside the draw.io app. A plain SVG export links them as `file:///…draw.io.app/…`, so SVG export MUST pass `--embed-svg-images`.
 - **FR-131** The agent never types or guesses a shape name. draw.io silently ignores unknown names and draws an empty box. Every vendor icon goes through the **shape catalog** (§10.8.3) by id.
 
 #### 10.8.2 Three icon sources and resolution order
@@ -1126,11 +1129,11 @@ flowchart TD
 
 #### 10.8.3 Shape catalog (built at release time, shipped with the skill)
 
-- **FR-132** `scripts/build-shape-catalog.py` (repo maintenance, *not* run by end users) builds `skills/draw-design/data/shapes/` from:
-  1. a **pinned tag of `jgraph/drawio`** (Apache-2.0): sidebar definitions `src/main/webapp/js/diagramly/sidebar/Sidebar-*.js` and stencil sets. Parse the style strings, titles and tags. If JS parsing proves brittle, fall back to (2);
-  2. the Apache-2.0 `shape-search/search-index.json` from `jgraph/drawio-mcp` (10,800 entries `{style,w,h,title,tags,type}`) as seed and cross-check.
-
-  The output records `drawioTag`, source commit SHAs, and licence notes. Re-running the script on a newer tag is how the catalog is updated (a normal PR with a diff of added and removed shapes).
+- **FR-132** `scripts/build-shape-catalog.py` (repo maintenance via `make shapes`, *not* run by end users) builds `skills/draw-design/data/shapes/` from the Apache-2.0 `shape-search/search-index.json` of `jgraph/drawio-mcp` at a **pinned commit**. jgraph generates that index by executing draw.io's sidebar code, so it carries exact styles. *ADR 0012:* parsing the minified sidebar JS directly proved brittle and was dropped.
+  - **Families:** entries are classified into families; duplicates resolve deterministically.
+  - **Verification:** with `--verify` every entry is **rendered by draw.io Desktop** and dropped if it does not draw. An unknown shape falls back to a `<rect>`, which is easy to detect.
+  - **Output:** the catalog records the source commit and `verifiedWith` (the draw.io version used), and a rebuild is byte-for-byte reproducible.
+  - **Search aliases:** a short curated alias list maps everyday words to services (postgres → RDS/Aurora/Cloud SQL).
 - **FR-133** Layout on disk (stays under NFR-012; the raw index is ~4.8 MB of JSON):
 
 ```text
@@ -1142,34 +1145,43 @@ data/shapes/
 └── LICENSES.md            # Apache-2.0 notice for jgraph sources; vendor icon terms per family
 ```
 
-`families.json` row:
+`families.json` holds `{catalogVersion, source{repo, path, commit, license}, verifiedWith, preferred{platform: [families]}, families[]}`. A row:
 
 ```json
 {
   "family": "gcp3",
-  "dialogName": "Google Cloud Platform 2026",
+  "title": "Google Cloud 2026 icons",
   "platform": "gcp",
   "prefix": "mxgraph.gcp3.",
   "kind": "stencil",
   "count": 45,
-  "since": "<first draw.io version that ships it>",
   "current": true,
-  "recolor": "fill",
-  "defaultSize": [48, 48],
-  "labelPlacement": "below",
-  "terms": "Google Cloud icon terms: see LICENSES.md"
+  "recolor": "none",
+  "groups": 0,
+  "note": "Google Cloud 2026 category and core icons"
 }
 ```
 
 Family entry (inside `<family>.json.gz`):
 
 ```json
-{ "id": "aws4:lambda", "title": "Lambda", "tags": ["compute", "serverless", "function"],
+{ "id": "aws4:lambda", "title": "Lambda", "tags": ["lambda", "compute"], "aliases": [],
   "style": "outlineConnect=0;fontColor=#232F3E;fillColor=#ED7100;strokeColor=#ffffff;dashed=0;verticalLabelPosition=bottom;verticalAlign=top;align=center;html=1;aspect=fixed;shape=mxgraph.aws4.resourceIcon;resIcon=mxgraph.aws4.lambda;",
-  "w": 48, "h": 48, "kind": "resourceIcon", "group": false }
+  "w": 78, "h": 78, "kind": "icon" }
 ```
 
-Families at research time (draw.io sidebar index): `aws4` 1,355 · `aws3` 317 (legacy) · `aws3d` 62 · `gcp2` 113 · `gcp3` 45 (the "2026" set) · `azure2` 701 (SVG images under `img/lib/azure2/`) · `kubernetes` 78 · `cisco19` 195 · IBM, Active Directory, Citrix, Cumulus, Dynamics365 and others. Counts are regenerated by the script, never hand-maintained.
+Families shipped (*ADR 0012*, verified with draw.io 32.7.4; counts are after de-duplication and are regenerated by the script, never hand-maintained):
+
+| Family | Count | Platform | Recolour |
+|---|---|---|---|
+| `aws4` | 1,006 | AWS | yes |
+| `gcp` | 141 | GCP, current product icons; the default for GCP | no |
+| `gcp3` | 45 | GCP, 2026 set | no (partial recolour) |
+| `gcp2` | 107 | GCP, legacy | no |
+| `azure2` | 660 | Azure | no (images) |
+| `kubernetes` | 39 | Kubernetes | yes |
+
+The older `gcpicons` set and `aws3`/`aws3d` are not catalogued.
 
 - **FR-134** **Vendor group containers** are catalogued too (`group: true`), e.g. `shape=mxgraph.aws4.group;grIcon=mxgraph.aws4.group_vpc` for an AWS VPC, plus the region, AZ, subnet, account and GCP project equivalents. A spec **zone** may carry `icon: "aws4:group_vpc"`. The compiler then emits the zone with the vendor group style, re-based on the theme's zone geometry and fonts, so trust boundaries look like the vendor's own reference diagrams.
 
@@ -1179,16 +1191,15 @@ Families at research time (draw.io sidebar index): `aws4` 1,355 · `aws3` 317 (l
 |---|---|---|---|
 | `icon` | node, zone | `<family>:<name>` (catalog) · `<name>` (bundled) · `<pack>:<name>` (imported) | none |
 | `iconStyle` | spec | `vendor` (official colours) · `mono` (tinted to the theme's `ink`/`muted`) | `vendor` when any icon is a vendor id, else `mono` |
-| `iconPlacement` | spec or node | `inside` (24px glyph top-left in an editorial box; label stays in the box) · `standalone` (vendor convention: the icon *is* the node, 48×48, label below) | `inside` for editorial types; `standalone` when `platform` is set on `architecture`/`deployment` |
+| `iconPlacement` | spec or node | `inside` (*built*: a 28px glyph 12px from the left edge, vertically centred; the label is left-aligned 10px after it; the node gains 30px of width; the icon replaces `tag`) · `standalone` (vendor convention: the icon *is* the node, 48×48, label below; *not built*: it needs the layout engine to size an icon-plus-label footprint and put ports on the icon) | `inside` |
 | `platform` | spec | `aws` · `gcp` · `azure` · `kubernetes` · `generic` | inferred (§10.8.5) |
-| `minDrawio` | spec | draw.io version string | doctor-detected installed version, else the OQ-02 minimum |
 
 Rules:
 
 - **FR-135** Treatments still apply to vendor-icon nodes. `focal` is drawn on the node frame (`inside`) or as an accent-tinted halo rect behind the icon (`standalone`), never by recolouring a vendor icon. Accent-budget rules are unchanged.
-- **FR-136** `iconStyle: vendor` exempts the icon cell's *own* colours from LR-T001 (palette). Everything else (labels, edges, zones) stays on the theme. `mono` recolours only families whose `recolor` ≠ `none` (e.g. `aws4` via `fillColor`/`strokeColor`). Image-based families (`azure2`) cannot be recoloured: in `mono` they keep vendor colours with an `info` finding, or the agent swaps to a bundled generic icon.
+- **FR-136** `iconStyle: vendor` exempts the icon cell's *own* colours from LR-T001 (palette). Everything else (labels, edges, zones) stays on the theme. `mono` recolours only families whose `recolor` ≠ `none`. *ADR 0012:* determined by test renders: `aws4` and `kubernetes` recolour via `fillColor`; `gcp3` and `gcp2` recolour only partly and are `none`. Image-based families (`azure2`) cannot be recoloured: in `mono` they keep vendor colours with an `info` finding, or the agent swaps to a bundled generic icon.
 
-#### 10.8.5 Context-aware library selection (agent workflow, goes into SKILL.md + `references/primitive-icons.md`)
+#### 10.8.5 Context-aware library selection (agent workflow, goes into SKILL.md + `references/icons.md`)
 
 ```mermaid
 sequenceDiagram
@@ -1198,7 +1209,7 @@ sequenceDiagram
     participant CLI as ddraw icons
     Agent->>Repo: detect platform signals (terraform providers, aws_/google_/azurerm_ resources, k8s manifests, cloudformation, serverless.yml, prompt wording)
     Agent->>CLI: ddraw icons families --platform aws --json
-    CLI-->>Agent: families + current flag + since versions (vs installed draw.io)
+    CLI-->>Agent: families + current flag + recolour support
     loop each component that benefits from an icon
         Agent->>CLI: ddraw icons search "sqs queue" --platform aws --limit 5 --json
         CLI-->>Agent: ranked ids (aws4:sqs, aws4:queue, …) with titles
@@ -1233,7 +1244,7 @@ Instructions the SKILL.md MUST give the agent (FR-138):
 
 #### 10.8.7 Version compatibility
 
-- **FR-139** Every catalog family has `since`. `ddraw build` compares each used family with `minDrawio` and reports LR-I003 when a shape requires a newer draw.io than the target. The doctor reports the installed draw.io version and lists catalog families it cannot render (§17.3 check 4a).
+- **FR-139** *ADR 0012:* the catalog records `verifiedWith`, the draw.io version every entry was rendered with. The doctor warns when the installed draw.io is older. Per-shape `since` and LR-I003 are not built. The doctor reports the installed draw.io version and lists catalog families it cannot render (§17.3 check 4a).
 
 #### 10.8.8 Bundled editorial icons
 
@@ -1547,7 +1558,7 @@ Unchanged from the reference (`engineer` / `mixed` / `executive` governs naming,
 | `--format` | CLI invocation (argument list, no shell) | Notes |
 |---|---|---|
 | `png` | `-x -f png -s <scale> -t -p <page> -o <out> <in>` | transparent by default (`--opaque` to drop `-t`) |
-| `svg` | `-x -f svg -s <scale> -t -p <page> -o <out> <in>` + FR-062 post-process | fonts embedded by default (`--embed-svg-fonts true`) |
+| `svg` | `-x -f svg -s <scale> -t --embed-svg-images -p <page> -o <out> <in>` + FR-062 post-process | fonts embedded by default (`--embed-svg-fonts true`) |
 | `pdf` | `-x -f pdf --crop -p <page> -o <out> <in>` (`-a` for all pages) | multi-page bundles → `--all-pages` |
 | `drawio.png` | `-x -f png -e -s <scale> -o <name>.drawio.png <in>` | editable PNG (diagram embedded) |
 | `drawio.svg` | `-x -f svg -e -o <name>.drawio.svg <in>` + post-process | editable in the VS Code draw.io extension |
@@ -1743,7 +1754,7 @@ flowchart TD
 | **Icons & shape libraries** (§10.8) ||||
 | LR-I001 | error | Every `mxgraph.*` shape / `img/lib/*` image used exists in the shipped catalog (compiled files); unknown ids in the spec fail with did-you-mean. On foreign files: `warn` | draw.io silently ignores unknown names |
 | LR-I002 | warn | At most one family per platform in a diagram (no `aws4` + `aws3d`, no `gcp2` + `gcp3`) | visual consistency |
-| LR-I003 | warn | No shape newer than the target draw.io version (`minDrawio`, catalog `since`) | version drift |
+| LR-I003 | warn | *Not built (ADR 0012):* replaced by the doctor's `verifiedWith` check | version drift |
 | LR-I004 | warn | `mono` requested on a non-recolourable family (e.g. `azure2`) | §10.8.4 FR-136 |
 | LR-I005 | warn | Icons all-or-none across comparable nodes (externals and actors exempt); ≤ 1 icon per node | editorial consistency |
 | LR-I006 | error | Imported-pack icons passed the sanitizer (hash in `pack.json` matches; no script, foreignObject or external refs) | trust boundary |
@@ -1800,7 +1811,7 @@ Invocation from the skill: `"<skill-dir>/scripts/ddraw" <subcommand> …` (POSIX
 | `theme resolve\|show\|check\|from-drawio\|apply` | Theme operations | `--project`, `--json` | 0/1/2 |
 | `profile <verb>` | Profile management | `--yes` (only for scripted tests) | 0/1/2 |
 | `library` | Brand library export (P2) | `--profile`, `-o` | 0/2 |
-| `icons families` | List catalog families (dialog name, platform, count, `since`, current, renderable by installed draw.io) | `--platform`, `--json` | 0 |
+| `icons families` | List catalog families (title, platform, count, current, recolour support, `verifiedWith`) | `--platform`, `--json` | 0 |
 | `icons search <query>` | Ranked catalog + bundled + pack matches by title and tags | `--platform`, `--family`, `--limit`, `--json` | 0 |
 | `icons show <id>` | Exact style, size, family, terms for one id | `--json` | 0/2 |
 | `icons import <src>` | Import and sanitize an icon pack (consent-gated for URLs) | `--name`, `--license`, `--to project\|home` | 0/1/2 |
@@ -2209,8 +2220,8 @@ flowchart LR
 | T-2.7 | Export: draw.io CLI discovery, invocation, PNG/SVG/PDF/`.drawio.png`/`.drawio.svg`, scale rules, SVG a11y post-process, `ddraw preview`, `references/export.md`, `/draw-design:export` | T-1.4 | §14, §B.3 | `export/`, `commands/export.md` | Render job: every Wave-1 example exports in all formats; SVG has `<title>/<desc>/role` |
 | T-2.8 | Doctor + `references/doctor.md` + `/draw-design:doctor` | T-2.7, T-2.3 | §17.3 | `doctor.py`, `commands/doctor.md` | Output contract tests; read-only verified |
 | T-2.9 | Commands: profile, onboard, check | T-2.3, T-1.8 | §17.2 | `commands/` | Each wraps a reference; NL routes in SKILL.md |
-| T-2.11 | `scripts/build-shape-catalog.py`: fetch a pinned `jgraph/drawio` tag (and drawio-mcp index as seed), parse sidebars, emit `data/shapes/families.json` + `<family>.json.gz`, `LICENSES.md`, per-family `since` (by scanning release tags for the first appearance of each prefix) | T-0.5 | §10.8.3 | `scripts/build-shape-catalog.py`, `data/shapes/` | Catalog contains aws4, aws3d, gcp2, gcp3, azure2, kubernetes, cisco19 with exact styles; shipped size ≤ 1.5 MB; reproducible from the pinned tag |
-| T-2.12 | Icon resolution in the compiler + `ddraw icons families/search/show` + LR-I001–I005, I007 + `references/primitive-icons.md` (agent workflow §10.8.5) + SKILL.md icon rules (FR-138) | T-2.11, T-1.3, T-1.8 | §10.8.2–10.8.5, §10.8.7 | `icons/` module, `lint/rules/i_*.py`, `references/primitive-icons.md` | Architecture example with `platform: aws` builds lint-clean; every emitted vendor style byte-matches its catalog entry; render job shows no empty boxes (pixel probe at icon centres) |
+| T-2.11 | **Done (ADR 0012): built from the pinned drawio-mcp index and render-verified, not from sidebar parsing.** Original plan: `scripts/build-shape-catalog.py`: fetch a pinned `jgraph/drawio` tag (and drawio-mcp index as seed), parse sidebars, emit `data/shapes/families.json` + `<family>.json.gz`, `LICENSES.md`, per-family `since` (by scanning release tags for the first appearance of each prefix) | T-0.5 | §10.8.3 | `scripts/build-shape-catalog.py`, `data/shapes/` | Catalog contains aws4, aws3d, gcp2, gcp3, azure2, kubernetes, cisco19 with exact styles; shipped size ≤ 1.5 MB; reproducible from the pinned tag |
+| T-2.12 | **Done (ADR 0012), except LR-I003.** Icon resolution in the compiler + `ddraw icons families/search/show` + LR-I001–I005, I007 + `references/icons.md` (agent workflow §10.8.5) + SKILL.md icon rules (FR-138) | T-2.11, T-1.3, T-1.8 | §10.8.2–10.8.5, §10.8.7 | `icons/` module, `lint/rules/i_*.py`, `references/icons.md` | Architecture example with `platform: aws` builds lint-clean; every emitted vendor style byte-matches its catalog entry; render job shows no empty boxes (pixel probe at icon centres) |
 | T-2.10 | README (install for both hosts, quickstart, gallery), CHANGELOG, release 0.1 checklist | all M2 | §18 | README, CHANGELOG | Fresh-machine install test documented for both hosts |
 
 ### 22.6 M3 — v1.0
@@ -2283,19 +2294,20 @@ Built and verified in the first development session. Agents picking up work shou
 | Lint core (T-1.8) | **mostly done** | LR-S001–S007, G001/G003/G004, B001–B004, C001–C007, T001/T002/T005, L001, X001/X002. Not yet: G002, T003, T004, T006, L002, L003, X003, LR-I* (icons) |
 | Engines | **done:** layered, lanes, lifelines, tidy tree, bands. **Not yet:** containment, cell grid, axes, radial, time scale, projection | |
 | Shipped types | **8 of 50:** architecture, flowchart, sequence, swimlane, state, tree, org-chart, layers | Wave 1 still missing: er, nested |
-| Build pipeline, CLI (T-1.24) | **done** | `build validate new types schema lint export preview doctor theme profile import` |
+| Build pipeline, CLI (T-1.24) | **done** | `build validate new types schema lint export preview doctor theme profile import icons` |
 | SKILL.md and references (T-2.1, T-2.2) | **done** for shipped scope | `style-guide.md` and `layout-budget.md` generated by `scripts/gen-docs.py` |
 | Profiles and marker resolution (T-2.3) | **done** | Onboarding from URL, skill, folder or `.drawio` (T-2.4, T-3.20) not started |
 | draw.io decoder (T-2.5) | **partial** | Decoding of compressed diagrams exists in lint and restyle; `ddraw digest` not built |
 | Restyle import (T-2.6) | **done** | `ddraw import --mode restyle` |
 | Export and doctor (T-2.7, T-2.8) | **done** | Verified against draw.io Desktop 32.7.4 |
 | Commands | **done:** doctor, export, check, profile, import-drawio | onboard command not built |
-| Shape catalog and icons (T-2.11, T-2.12, T-3.25, T-4.28) | **not started** | |
+| Shape catalog and icons (T-2.11, T-2.12) | **done** (ADR 0012) | 1,998 render-verified icons in 6 families; `ddraw icons families/search/show`; node icons inside boxes on `architecture` and `sequence`; `iconStyle` vendor/mono; LR-I001/I002/I004/I005/I007; SVG export embeds library images |
+| Vendor group zones, standalone icons, bundled generic icons, icon packs (T-3.25, T-4.28) | **not started** | standalone placement needs layout support (ADR 0012) |
 | Redraw import, Mermaid and PlantUML (T-3.18, T-3.19, T-4.25) | **not started** | |
 | Variants: full editorial, sketch (T-3.17, T-4.29) | **partial** | dark removed (ADR 0011); full and sketch flag are emitted but the full layout is not built |
 | Evals (T-3.23) | **not started** | |
 
-Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), shape catalog and icons (T-2.11, T-2.12), redraw import with Mermaid (T-3.18, T-3.19), then Wave 2 types.
+Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), vendor group zones (T-3.25: AWS VPC/region, GCP project), redraw import with Mermaid (T-3.18, T-3.19), then Wave 2 types.
 
 ## 23. Risks and mitigations
 
@@ -2314,7 +2326,7 @@ Suggested next tasks, in order: `er` and `nested` types (finishes Wave 1), shape
 | R-11 | Trigger collision with jgraph's official `drawio` skill when both are installed (both match "draw a diagram") | High | Med | FR-120: complementary positioning; description emphasizes editorial/brand/restyle/type names; README explains when to use which; eval prompts include "both installed" cases |
 | R-12 | GPL-3.0 draw.io Desktop invoked by an MIT plugin | Low | Med | Invoke as a separate user-installed program only; never bundle, vendor or link; legal check before 1.0 |
 | R-13 | draw.io renders edge `arcSize` differently across versions | Med | Low | minimum version pinned (OQ-02); render job tests oldest + latest |
-| R-14 | Shape catalog drifts from the user's draw.io (new families like GCP 2026 render blank in older versions; renamed stencils) | Med | Med | Per-family `since`; LR-I003; doctor 4a; catalog rebuilt per release from a pinned tag with a diff review; fallback to the previous family |
+| R-14 | Shape catalog drifts from the user's draw.io (new families like GCP 2026 render blank in older versions; renamed stencils) | Med | Med | Render-verified catalog with `verifiedWith` + doctor warning (ADR 0012); catalog rebuilt per release from a pinned tag with a diff review; fallback to the previous family |
 | R-15 | Vendor icon terms (some packs restrict modification, e.g. recolouring) | Med | Low | Default `iconStyle: vendor` (unmodified) for vendor ids; `mono` documented as user's choice; terms per family in `data/shapes/LICENSES.md` |
 
 ---
@@ -2450,7 +2462,7 @@ Sources: drawio.com docs (diagram-generation, style-reference, json-layout-speci
 | Import extractors | `skills/diagram-design/scripts/*_extract.py`, `scripts/fixtures/*` | `importers/` (re-implement; fixtures may be copied with attribution) |
 | Doctor | `references/doctor.md` | `doctor.py`, `references/doctor.md` |
 | Manifests, versioning | `.claude-plugin/`, `.codex-plugin/`, `.agents/`, ADR 0008/0009 | same paths |
-| Icons | `references/primitive-icons.md`, `scripts/vendor/icons/` | `data/icons/` (bundled) + `data/shapes/` (draw.io catalog, new) |
+| Icons | `references/icons.md`, `scripts/vendor/icons/` | `data/icons/` (bundled) + `data/shapes/` (draw.io catalog, new) |
 
 ## D. Glossary
 

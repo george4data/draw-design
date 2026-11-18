@@ -34,5 +34,6 @@
     "infrastructure diagram",
     "topology"
   ],
-  "useWhen": "Components and connections in one snapshot; tiers or trust boundaries as zones."
+  "useWhen": "Components and connections in one snapshot; tiers or trust boundaries as zones.",
+  "icons": true
 }

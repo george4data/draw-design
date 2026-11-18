@@ -18,6 +18,7 @@ The spec is the only thing you write. `ddraw build` validates it strictly: **unk
 | `audience` | no | `mixed` | `engineer` · `mixed` · `executive`: governs wording, which is your job |
 | `nodes`, `edges`, `zones`, `callouts` | — | `[]` | below |
 | `legend` | no | `"auto"` | `false` to suppress |
+| `iconStyle` | no | `vendor` | `vendor` (official colours) or `mono` (theme ink; `aws4` and `kubernetes` only). Only with node icons |
 
 ## Nodes
 
@@ -30,6 +31,7 @@ The spec is the only thing you write. `ddraw build` validates it strictly: **unk
 - `role`: `backend` (default), `store`, `external`, `input`, `optional`, `security`, plus type-specific roles.
 - `tag` ≤ 6 alphanumerics (`API`, `DB`, `EXT`, `EDGE`), shown as a small rectangular tag.
 - `focal`: accent treatment. Combined with accent edges, at most 2.
+- `icon` (`architecture`, `sequence`): a vendor icon id such as `aws4:lambda` or `gcp:cloud_run`, drawn at the node's left. It replaces `tag`. Get ids from `ddraw icons search`; never guess. See [icons.md](icons.md).
 - `place`: layout hints. `{"rank": n}` puts the node in column/row *n* along the flow; `{"order": n}` orders nodes inside a rank. Use them only to fix a layout you don't like.
 - `meta`: up to 12 string key/values stored on the shape (draw.io *Edit Data*). `"url": "https://…"` becomes a clickable link.
 

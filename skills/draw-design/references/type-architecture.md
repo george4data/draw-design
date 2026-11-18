@@ -38,6 +38,10 @@
 
 ≤ 9 nodes, ≤ 12 edges, ≤ 3 zones, ≤ 2 accents. Over budget: split into an overview (zones as nodes) and one detail diagram per zone.
 
+## Cloud icons
+
+On AWS, Google Cloud, Azure or Kubernetes, give each service node its vendor icon (`"icon": "aws4:lambda"`). The icon replaces the tag. Name the role in `label` and the service in `sublabel`. Take ids from `ddraw icons search` only, and read [icons.md](icons.md) first. `examples/architecture-aws.dd.json` shows a complete diagram.
+
 ## Anti-patterns
 
 - Every service in its own zone: zones are tiers or trust boundaries, not decoration.

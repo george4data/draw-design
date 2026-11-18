@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import os
 import platform
+import re
 import shutil
 import subprocess
 import sys
@@ -64,6 +65,31 @@ def _fonts_installed(families: list[str]) -> dict[str, bool]:
     return names
 
 
+def _version_tuple(v: str) -> tuple[int, ...]:
+    return tuple(int(p) for p in re.findall(r"\d+", v)[:3])
+
+
+def _icons_check(installed: str) -> Check:
+    from ddraw.icons import catalog
+
+    fams = catalog.families()
+    if not fams:
+        return Check(
+            "icons", "fail", "shape catalog missing (data/shapes/families.json)", "reinstall the plugin"
+        )
+    total = sum(f.count for f in fams.values())
+    verified = catalog.verified_with()
+    msg = f"{total} vendor icons in {len(fams)} families, verified with draw.io {verified or 'unknown'}"
+    if installed and verified and _version_tuple(installed) < _version_tuple(verified):
+        return Check(
+            "icons",
+            "warn",
+            f"{msg}; installed draw.io {installed} is older, so some icons may draw as empty boxes",
+            "update draw.io Desktop",
+        )
+    return Check("icons", "pass", msg)
+
+
 def run(project: Path) -> list[Check]:
     checks: list[Check] = []
     v = sys.version_info
@@ -109,6 +135,7 @@ def run(project: Path) -> list[Check]:
                 "install draw.io Desktop or set DRAWIO_CLI",
             )
         )
+    checks.append(_icons_check(cli.version if cli else ""))
     if platform.system() == "Linux" and not os.environ.get("DISPLAY"):
         ok = bool(shutil.which("xvfb-run"))
         checks.append(

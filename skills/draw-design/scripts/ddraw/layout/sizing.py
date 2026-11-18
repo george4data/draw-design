@@ -38,6 +38,17 @@ SHAPE_BY_ROLE = {
     "state": "state",
 }
 MARKERS = {"dot": 24, "ring": 32}
+# Vendor icon inside a node (PRD §10.8.4 `inside`): 28px glyph 12px from the left edge, then a
+# 10px gap before the left-aligned label.
+ICON = 28
+ICON_X = 12
+ICON_TEXT_X = ICON_X + ICON + 10  # label starts here
+ICON_ROOM = ICON_TEXT_X + 12 - 2 * PAD  # extra width over a centred label (12px right padding)
+
+
+def icon_y(h: float) -> int:
+    """Top of a centred icon in a box (or lifeline header) of height h, on the 4px grid."""
+    return int((h - ICON) // 2 // 4 * 4)
 
 
 def widths() -> list[int]:
@@ -62,16 +73,16 @@ def size_nodes(nodes: list[Node], ramp: dict[str, Any]) -> dict[str, PNode]:
     allowed = widths()
     findings: list[Finding] = []
     box_need = 0.0
-    any_tag = any(n.tag for n in nodes)
+    any_tag = any(n.tag and not n.icon for n in nodes)
     for n in nodes:
         if SHAPE_BY_ROLE.get(n.role) not in ("rhombus", "dot", "ring"):
-            box_need = max(box_need, text_need(n, ramp) + 2 * PAD)
+            box_need = max(box_need, text_need(n, ramp) + 2 * PAD + (ICON_ROOM if n.icon else 0))
     w = pick(box_need, allowed)
     if w is None:
         findings.append(
             Finding(
                 "TEXT-001",
-                f"a label needs {box_need:.0f}px; the widest node is 320px",
+                f"a label needs {box_need:.0f}px; the widest node is {allowed[-1]}px",
                 pointer="/nodes",
                 fix="shorten the longest label or sublabel",
             )

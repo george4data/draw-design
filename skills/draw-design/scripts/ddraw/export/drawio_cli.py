@@ -167,6 +167,10 @@ def export(
         args += ["-t"]
     if embed:
         args += ["-e"]
+    if kind == "svg":
+        # Built-in library images (e.g. Azure icons) would otherwise be linked as file:// paths
+        # into the draw.io app bundle, which break on every other machine.
+        args += ["--embed-svg-images"]
     if kind == "pdf":
         args += ["--crop"]
     if all_pages and kind in ("pdf", "svg"):

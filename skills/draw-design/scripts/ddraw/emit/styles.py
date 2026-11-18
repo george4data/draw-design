@@ -156,7 +156,14 @@ def styles_num(v: float) -> str:
 
 
 def node_style(
-    theme: Theme, treatment_name: str, shape: str, has_tag: bool, sketch: bool, h: float, header: float = 48
+    theme: Theme,
+    treatment_name: str,
+    shape: str,
+    has_tag: bool,
+    sketch: bool,
+    h: float,
+    header: float = 48,
+    icon_text_x: int = 0,
 ) -> str:
     pairs = treatment(theme, treatment_name, sketch)
     base = ""
@@ -188,6 +195,10 @@ def node_style(
             ("lifelineDashed", "1"),
         ]
         pairs += [("verticalAlign", "top"), ("spacingTop", "8")]
+        if icon_text_x:
+            return render(
+                base, [*pairs, ("align", "left"), ("spacing", "4"), ("spacingLeft", str(icon_text_x - 4))]
+            )
         return render(base, [*pairs, ("align", "center"), ("spacing", "4")])
     elif shape == "state":
         pairs = [(k, str(theme.raw["radius"]["lg"]) if k == "arcSize" else v) for k, v in pairs]
@@ -195,6 +206,10 @@ def node_style(
         base = "ellipse"
         pairs = [(k, v) for k, v in pairs if k not in ("rounded", "arcSize", "absoluteArcSize")]
         pairs += [("perimeter", "ellipsePerimeter")]
+    if icon_text_x:
+        pairs += [("align", "left"), ("verticalAlign", "middle"), ("spacing", "4")]
+        pairs += [("spacingLeft", str(icon_text_x - 4))]
+        return render(base, pairs)
     pairs += [("align", "center"), ("verticalAlign", "middle"), ("spacing", "4")]
     if has_tag:
         pairs += [("spacingTop", "12")]

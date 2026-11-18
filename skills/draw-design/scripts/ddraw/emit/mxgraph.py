@@ -8,7 +8,9 @@ from collections.abc import Callable
 
 from ddraw import __version__
 from ddraw.emit import styles
+from ddraw.icons import catalog
 from ddraw.ir import Box, ExtraCell, Page, PEdge, PNode, Point
+from ddraw.layout import sizing
 from ddraw.theme.model import Theme
 
 
@@ -225,6 +227,9 @@ def write(page: Page, theme: Theme) -> str:
                 user["link"] = v
             else:
                 user[f"dd-meta-{k}"] = v
+        icon = catalog.lookup(pn.node.icon) if pn.node.icon else None
+        if icon is not None:
+            user["dd-icon"] = icon.id
         w.cell(
             f"dd-{pn.id}",
             value=node_label(pn, theme, ramp),
@@ -232,17 +237,30 @@ def write(page: Page, theme: Theme) -> str:
                 theme,
                 pn.treatment,
                 pn.shape,
-                bool(pn.node.tag),
+                bool(pn.node.tag) and icon is None,
                 spec.sketch,
                 pn.box.h,
                 page.ramp["minNodeHeight"],
+                icon_text_x=sizing.ICON_TEXT_X if icon is not None else 0,
             ),
             parent=pid,
             vertex=True,
             geometry=geom(pn.box, ox, oy),
             user=user,
         )
-        if pn.node.tag:
+        if icon is not None:
+            mono = theme.c("muted") if spec.icon_style == "mono" and catalog.recolorable(icon.id) else ""
+            head = page.ramp["minNodeHeight"] if pn.shape == "lifeline" else pn.box.h
+            w.cell(
+                f"dd-{pn.id}-icon",
+                style=catalog.cell_style(icon, mono),
+                parent=f"dd-{pn.id}",
+                vertex=True,
+                geometry=geom(Box(sizing.ICON_X, sizing.icon_y(head), sizing.ICON, sizing.ICON)),
+                connectable=False,
+                user={"dd-role": "icon", "dd-icon": icon.id, "dd-icon-style": "mono" if mono else "vendor"},
+            )
+        elif pn.node.tag:
             tw = max(28, round(len(pn.node.tag) * 7 * 0.62 + 10))
             tw = (tw + 3) // 4 * 4
             tb = Box(8, 8, tw, 12)

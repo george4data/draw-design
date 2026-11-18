@@ -1,0 +1,88 @@
+{
+  "catalogVersion": 1,
+  "source": {
+    "repo": "https://github.com/jgraph/drawio-mcp",
+    "path": "shape-search/search-index.json",
+    "commit": "cfc1b916b9deaa7c78d23d719d4124bd76d2d0bf",
+    "license": "Apache-2.0"
+  },
+  "verifiedWith": "32.7.4",
+  "preferred": {
+    "aws": [
+      "aws4"
+    ],
+    "gcp": [
+      "gcp",
+      "gcp3",
+      "gcp2"
+    ],
+    "azure": [
+      "azure2"
+    ],
+    "kubernetes": [
+      "kubernetes"
+    ]
+  },
+  "families": [
+    {
+      "family": "aws4",
+      "title": "AWS architecture icons",
+      "platform": "aws",
+      "current": true,
+      "recolor": "fill",
+      "count": 1006,
+      "groups": 17,
+      "note": "Amazon Web Services architecture icons"
+    },
+    {
+      "family": "gcp",
+      "title": "Google Cloud product icons",
+      "platform": "gcp",
+      "current": true,
+      "recolor": "none",
+      "count": 141,
+      "groups": 0,
+      "note": "Google Cloud product icons (multicolour)"
+    },
+    {
+      "family": "gcp3",
+      "title": "Google Cloud 2026 icons",
+      "platform": "gcp",
+      "current": true,
+      "recolor": "none",
+      "count": 45,
+      "groups": 0,
+      "note": "Google Cloud 2026 category and core icons"
+    },
+    {
+      "family": "gcp2",
+      "title": "Google Cloud (legacy stencils)",
+      "platform": "gcp",
+      "current": false,
+      "recolor": "none",
+      "count": 107,
+      "groups": 0,
+      "note": "older GCP stencils, mostly generic"
+    },
+    {
+      "family": "azure2",
+      "title": "Microsoft Azure",
+      "platform": "azure",
+      "current": true,
+      "recolor": "none",
+      "count": 660,
+      "groups": 0,
+      "note": "Azure icons (draw.io built-in images)"
+    },
+    {
+      "family": "kubernetes",
+      "title": "Kubernetes",
+      "platform": "kubernetes",
+      "current": true,
+      "recolor": "fill",
+      "count": 39,
+      "groups": 0,
+      "note": "Kubernetes resource icons"
+    }
+  ]
+}

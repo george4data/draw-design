@@ -33,11 +33,12 @@ Turn a description of a system, process or decision into an **editorial-quality,
    - `marker-missing-profile`: the project's `.draw-design` marker names a profile that does not exist. Tell the user which slug is missing and ask whether to continue with the default.
 2. **Choose the diagram type** from §3. If two seem to fit, pick the dominant axis. Load **exactly one** type reference (`references/type-<slug>.md`) and `references/spec-reference.md`.
 3. **Confirm the plan** in one short message: type, size preset, direction, and what the budget forces you to cut. If the request already pins all of these, or the user is not reachable, proceed and list the assumptions beside the result.
-4. **Write the spec** next to where the diagram belongs (default: the current directory), named after the subject: `checkout-platform.dd.json`. Start from `ddraw new <type> -o <file>` if helpful. Content only: labels, roles, relations, zones, focal. **No colours, fonts or pixel sizes**: the theme and compiler own those.
-5. **Build:** `ddraw build <file>.dd.json --json`. It writes `<file>.drawio` only when lint is clean.
-6. **Fix loop (max 3 builds).** Every finding has a code, a JSON pointer into your spec and a fix. Typical fixes: shorten a label, merge nodes, add `place.rank` / `place.order` hints, switch `direction`, pick a larger `size`. `LAYOUT-001` means it does not fit: prefer splitting or a larger preset over cramming. After 3 failed builds, stop and report the remaining findings to the user.
-7. **Visual self-review** (when draw.io Desktop is available): `ddraw preview <file>.drawio` prints a PNG path. Look at it. Check that the focal element is what the reader should see first, nothing crowds, labels read, and the story is obvious. Fix the spec if not.
-8. **Deliver**: the `.drawio` path, type and preset, any assumptions or cuts, lint status, and how to open it (draw.io Desktop, app.diagrams.net, or the VS Code "Draw.io Integration" extension). Keep the `.dd.json` next to it: future edits change the spec and rebuild. Never paste XML into chat.
+4. **Icons (architecture, sequence).** If the system runs on AWS, Google Cloud, Azure or Kubernetes and the reader knows that platform, give every service node its vendor icon. Read `references/icons.md` and take every id from `ddraw icons search`.
+5. **Write the spec** next to where the diagram belongs (default: the current directory), named after the subject: `checkout-platform.dd.json`. Start from `ddraw new <type> -o <file>` if helpful. Content only: labels, roles, relations, zones, focal. **No colours, fonts or pixel sizes**: the theme and compiler own those.
+6. **Build:** `ddraw build <file>.dd.json --json`. It writes `<file>.drawio` only when lint is clean.
+7. **Fix loop (max 3 builds).** Every finding has a code, a JSON pointer into your spec and a fix. Typical fixes: shorten a label, merge nodes, add `place.rank` / `place.order` hints, switch `direction`, pick a larger `size`. `LAYOUT-001` means it does not fit: prefer splitting or a larger preset over cramming. After 3 failed builds, stop and report the remaining findings to the user.
+8. **Visual self-review** (when draw.io Desktop is available): `ddraw preview <file>.drawio` prints a PNG path. Look at it. Check that the focal element is what the reader should see first, nothing crowds, labels read, and the story is obvious. Fix the spec if not.
+9. **Deliver**: the `.drawio` path, type and preset, any assumptions or cuts, lint status, and how to open it (draw.io Desktop, app.diagrams.net, or the VS Code "Draw.io Integration" extension). Keep the `.dd.json` next to it: future edits change the spec and rebuild. Never paste XML into chat.
 
 **Editing an existing diagram:** if `<name>.dd.json` exists, edit it and rebuild. If only a `.drawio` exists, tell the user that round-trip editing of hand-edited files is planned. Then offer to rebuild from a new spec, which loses manual layout tweaks.
 
@@ -70,6 +71,7 @@ Other types (ER, nested, deployment, charts and more) are planned. If the reques
 | Edge label | ≤ 14 chars, rendered uppercase. Only when it adds information (`SQL`, `HTTPS`, `YES`/`NO`) |
 | Connectors | right angles only; labels sit 8px off their line on a paper mask; no line passes behind a box that is not its endpoint; parallel lines ≥ 12px apart |
 | Grid | every box on a 4px grid; sizes from a fixed set |
+| Icons | ids from the catalog only (`LR-I001`); one family per platform; every service or none; `architecture` and `sequence` only |
 
 Edge `kind`: `default` (internal call), `accent` (the headline path), `link` (HTTP/API or external system), `async` (dashed, open arrow), `return` (dashed). Node `role`: `backend`, `store`, `external`, `input` (clients/users), `optional`, `security`, plus type roles (flowchart: `start`, `end`, `step`, `decision`). A legend strip is added automatically for the roles and edge kinds you used.
 
@@ -87,6 +89,7 @@ Edge `kind`: `default` (internal call), `accent` (the headline path), `link` (HT
 |---|---|---|
 | "export as PNG / SVG / PDF", "editable PNG/SVG for the README" | `ddraw export <file>.drawio --format png\|svg\|pdf\|drawio.png\|drawio.svg [--scale 2]`. **Only when asked.** | [export.md](references/export.md) |
 | "check / lint this diagram" (any .drawio, including hand-made ones) | `ddraw lint <file>.drawio [--json]` and explain the findings | [lint.md](references/lint.md) |
+| "use AWS / GCP / Azure / Kubernetes icons", "official icons" | `ddraw icons search "<service>" --platform <p>`, then `icon` on nodes | [icons.md](references/icons.md) |
 | "check my setup", "why doesn't export work" | `ddraw doctor` | [doctor.md](references/doctor.md) |
 | "use our brand colours", "make a profile for client X", "switch to the acme theme" | `ddraw profile new/use/list/show` with the user's colours; check contrast | [profiles.md](references/profiles.md) |
 | "restyle / clean up this .drawio", "apply our theme to these diagrams" | `ddraw import <file> [--snap] [--focal ids]`, then `ddraw lint` the result | [import-drawio.md](references/import-drawio.md) |

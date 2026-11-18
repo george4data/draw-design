@@ -10,6 +10,7 @@ from dataclasses import dataclass
 
 from ddraw import registry
 from ddraw.errors import Finding
+from ddraw.icons import catalog
 from ddraw.ir import Box, Point
 from ddraw.layout.page import LEGEND_ORDER_EDGES, LEGEND_ORDER_NODES
 from ddraw.lint.model import Cell, DrawPage
@@ -17,6 +18,7 @@ from ddraw.text.measure import width
 from ddraw.theme.model import Theme
 
 NON_NODE_ROLES = {
+    "icon",
     "title",
     "eyebrow",
     "subtitle",
@@ -546,6 +548,8 @@ def t001(page: DrawPage, ctx: Context) -> list[Finding]:
     palette = ctx.theme.palette()
     out = []
     for c in page.cells.values():
+        if c.role == "icon" and c.attrs.get("dd-icon-style") != "mono":
+            continue  # vendor icon colours are reported by LR-I007, not failed
         used: list[str] = []
         for k in COLOR_KEYS:
             if k in c.style and c.style[k] not in ("none", "default", "inherit"):
@@ -656,6 +660,71 @@ def x002(page: DrawPage, ctx: Context) -> list[Finding]:
     return out
 
 
+# ---------------------------------------------------------------- vendor icons
+
+
+def _icon_family(c: Cell) -> str:
+    if c.attrs.get("dd-icon"):
+        return c.attrs["dd-icon"].split(":", 1)[0]
+    key = catalog.shape_key(c.style)
+    return key[0] if key else ""
+
+
+def i001(page: DrawPage, ctx: Context) -> list[Finding]:
+    known = catalog.known_keys()
+    out = []
+    for c in page.cells.values():
+        if not c.vertex:
+            continue
+        if c.attrs.get("dd-icon") and catalog.lookup(c.attrs["dd-icon"]) is None:
+            out.append(
+                Finding("LR-I001", f"icon {c.attrs['dd-icon']!r} is not in the shape catalog", cell=c.id)
+            )
+            continue
+        key = catalog.shape_key(c.style)
+        if key and key not in known:
+            out.append(
+                Finding(
+                    "LR-I001",
+                    f"{key[0]} shape {key[1]!r} is not in the catalog; it may draw as an empty box",
+                    cell=c.id,
+                    severity="error" if ctx.compiled else "warn",
+                    fix="pick an id from `ddraw icons search`",
+                )
+            )
+    return out
+
+
+def i002(page: DrawPage, ctx: Context) -> list[Finding]:
+    fams = catalog.families()
+    by_platform: dict[str, set[str]] = {}
+    for c in page.cells.values():
+        f = _icon_family(c) if c.vertex else ""
+        if f in fams:
+            by_platform.setdefault(fams[f].platform, set()).add(f)
+    return [
+        Finding(
+            "LR-I002",
+            f"{p} icons mix families {', '.join(sorted(fs))}",
+            severity="warn" if ctx.compiled else "info",
+            fix="use one icon family per platform",
+        )
+        for p, fs in sorted(by_platform.items())
+        if len(fs) > 1
+    ]
+
+
+def i007(page: DrawPage, ctx: Context) -> list[Finding]:
+    if not ctx.compiled:
+        return []
+    n = sum(1 for c in page.cells.values() if c.role == "icon" and c.attrs.get("dd-icon-style") != "mono")
+    if not n:
+        return []
+    return [
+        Finding("LR-I007", f"{n} vendor icon(s) keep their official colours (exempt from LR-T001)", "info")
+    ]
+
+
 RULES: list[Rule] = [
     s001,
     s002,
@@ -680,4 +749,7 @@ RULES: list[Rule] = [
     l001,
     x001,
     x002,
+    i001,
+    i002,
+    i007,
 ]
