@@ -1884,8 +1884,8 @@ Principle (reference ADR 0008): **one plugin root, minimal native manifests, zer
   "name": "draw-design",
   "description": "Editorial, on-brand diagrams as native, editable draw.io files. Architecture, flowcharts, sequence, state machines, ER and database schemas, swimlanes, org charts, timelines, Gantt, kanban, quadrants and charts. Restyles or redraws existing draw.io, Mermaid, PlantUML and Excalidraw files. Exports PNG, SVG and PDF.",
   "version": "0.1.0",
-  "author": { "name": "<owner>" },
-  "repository": "https://github.com/<owner>/draw-design",
+  "author": { "name": "George Pulinattu" },
+  "repository": "https://github.com/george4data/draw-design",
   "license": "MIT",
   "keywords": ["diagrams", "drawio", "diagrams.net", "architecture", "flowchart", "sequence", "editable", "brand", "mermaid", "import", "export"]
 }
@@ -1896,7 +1896,7 @@ Principle (reference ADR 0008): **one plugin root, minimal native manifests, zer
 ```json
 {
   "name": "draw-design",
-  "owner": { "name": "<owner>" },
+  "owner": { "name": "George Pulinattu" },
   "metadata": { "description": "<same as plugin description>" },
   "plugins": [ { "name": "draw-design", "source": "./" } ]
 }
@@ -1905,7 +1905,7 @@ Principle (reference ADR 0008): **one plugin root, minimal native manifests, zer
 Install (README):
 
 ```text
-/plugin marketplace add <owner>/draw-design
+/plugin marketplace add george4data/draw-design
 /plugin install draw-design@draw-design
 ```
 
@@ -1920,8 +1920,8 @@ Standalone skill (no commands): `ln -s <checkout>/skills/draw-design ~/.claude/s
   "name": "draw-design",
   "description": "<identical to Claude description>",
   "version": "0.1.0",
-  "author": { "name": "<owner>" },
-  "repository": "https://github.com/<owner>/draw-design",
+  "author": { "name": "George Pulinattu" },
+  "repository": "https://github.com/george4data/draw-design",
   "license": "MIT",
   "keywords": ["<identical list>"],
   "skills": "./skills/",
@@ -1929,7 +1929,7 @@ Standalone skill (no commands): `ln -s <checkout>/skills/draw-design ~/.claude/s
     "displayName": "Draw Design",
     "shortDescription": "Create editable, on-brand draw.io diagrams",
     "longDescription": "<long form incl. every shipped type name — trigger surface>",
-    "developerName": "<owner>",
+    "developerName": "George Pulinattu",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "defaultPrompt": [
@@ -1962,7 +1962,7 @@ Standalone skill (no commands): `ln -s <checkout>/skills/draw-design ~/.claude/s
 Install (README):
 
 ```bash
-codex plugin marketplace add <owner>/draw-design
+codex plugin marketplace add george4data/draw-design
 codex plugin add draw-design@draw-design
 ```
 

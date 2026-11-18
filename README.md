@@ -39,14 +39,14 @@ PNG, SVG and PDF exports go through the draw.io Desktop command line.
 **Claude Code**
 
 ```text
-/plugin marketplace add <owner>/draw-design
+/plugin marketplace add george4data/draw-design
 /plugin install draw-design@draw-design
 ```
 
 **Codex**
 
 ```bash
-codex plugin marketplace add <owner>/draw-design
+codex plugin marketplace add george4data/draw-design
 codex plugin add draw-design@draw-design
 ```
 
