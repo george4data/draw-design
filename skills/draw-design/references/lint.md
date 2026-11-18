@@ -22,5 +22,8 @@
 | LR-L001 | the legend covers exactly the treatments and edge kinds used |
 | LR-X001 | links are `https:`, `mailto:` or internal page links only |
 | LR-X002 | images are embedded data URIs or draw.io built-in library paths |
+| LR-I001 | every AWS / GCP / Azure / Kubernetes shape is in the verified catalog (otherwise draw.io may draw an empty box; `warn` on other files) |
+| LR-I002 | one icon family per platform (e.g. not `gcp` with `gcp3`) |
+| LR-I007 | info: vendor icons keep official colours, so they are exempt from LR-T001 |
 
 Exit codes: 0 clean, 1 errors (or warnings with `--strict`), 2 unreadable input.

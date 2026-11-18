@@ -84,6 +84,7 @@ jgraph publishes an official draw.io skill that authors Mermaid or raw XML. draw
 make venv     # .venv with pytest, ruff, mypy (via uv)
 make check    # ruff + mypy --strict + pytest + docs/package checks
 make render   # rebuild gallery/ and render PNGs (needs draw.io Desktop)
+make shapes   # rebuild the vendor icon catalog (maintainers; needs draw.io Desktop)
 ```
 
 Read [AGENTS.md](AGENTS.md) first. Architecture decisions are recorded in [`docs/decisions/`](docs/decisions/).

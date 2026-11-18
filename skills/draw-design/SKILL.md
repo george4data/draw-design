@@ -1,6 +1,6 @@
 ---
 name: draw-design
-description: Create editorial, on-brand diagrams as native, editable draw.io (.drawio) files — architecture and system diagrams, infrastructure and topology maps, flowcharts and decision flows, sequence diagrams and request flows, swimlanes and cross-team handoffs, state machines and lifecycles, trees and hierarchies, org charts and escalation paths, layer stacks — with orthogonal connectors, one focal accent, a bottom legend and your brand theme, then lint them against editorial rules and export PNG, SVG or PDF through draw.io Desktop. Use when the user wants a draw.io / drawio / diagrams.net diagram, an editable diagram, an on-brand or editorial diagram, or exports of one.
+description: Create editorial, on-brand diagrams as native, editable draw.io (.drawio) files — architecture and system diagrams, infrastructure and topology maps, flowcharts and decision flows, sequence diagrams and request flows, swimlanes and cross-team handoffs, state machines and lifecycles, trees and hierarchies, org charts and escalation paths, layer stacks — with official AWS, Google Cloud, Azure and Kubernetes service icons, orthogonal connectors, one focal accent, a bottom legend and your brand theme, then lint them against editorial rules and export PNG, SVG or PDF through draw.io Desktop. Use when the user wants a draw.io / drawio / diagrams.net diagram, a cloud architecture diagram with AWS or GCP icons, an editable diagram, an on-brand or editorial diagram, or exports of one.
 license: MIT
 metadata:
   version: "0.1"
