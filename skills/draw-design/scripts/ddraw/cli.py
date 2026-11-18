@@ -246,6 +246,35 @@ def cmd_profile(a: argparse.Namespace) -> int:
     return EXIT_USAGE
 
 
+def cmd_import(a: argparse.Namespace) -> int:
+    from ddraw.importers.restyle import restyle_file
+    from ddraw.pipeline import resolve_theme_for
+
+    src = Path(a.src)
+    if a.mode != "restyle":
+        _err("redraw import is planned; use --mode restyle to keep the layout and apply the theme")
+        return EXIT_USAGE
+    if not src.name.endswith((".drawio", ".xml", ".dio")):
+        _err("restyle supports .drawio / .xml files (Mermaid, PlantUML and Excalidraw redraw are planned)")
+        return EXIT_USAGE
+    theme = resolve_theme_for(Path(a.project) if a.project else src.resolve().parent, a.profile)
+    focal = set(a.focal.split(",")) if a.focal else set()
+    out, report = restyle_file(
+        src,
+        Path(a.output) if a.output else None,
+        theme,
+        snap=a.snap,
+        focal=focal,
+        orthogonal=not a.keep_edges,
+    )
+    text = report.markdown(str(src), str(out))
+    if a.json:
+        print(json.dumps({"status": "ok", "output": str(out), "report": text}))
+    else:
+        print(text)
+    return EXIT_OK
+
+
 def not_implemented(name: str) -> Callable[[argparse.Namespace], int]:
     def run(_: argparse.Namespace) -> int:
         _err(f"`ddraw {name}` is not implemented yet (see docs/prd.md §22 for its milestone)")
@@ -348,8 +377,19 @@ def parser() -> argparse.ArgumentParser:
     pr.add_argument("--json", action="store_true")
     pr.set_defaults(fn=cmd_profile)
 
+    im = sub.add_parser("import", help="restyle an existing draw.io file to the theme (redraw planned)")
+    im.add_argument("src")
+    im.add_argument("--mode", choices=["restyle", "redraw"], default="restyle")
+    im.add_argument("-o", "--output")
+    im.add_argument("--snap", action="store_true", help="snap shapes to the 4px grid")
+    im.add_argument("--focal", help="comma-separated cell ids to accent (max 2)")
+    im.add_argument("--keep-edges", action="store_true", help="keep the source edge routing style")
+    im.add_argument("--profile")
+    im.add_argument("--project")
+    im.add_argument("--json", action="store_true")
+    im.set_defaults(fn=cmd_import)
+
     for name, helptext in (
-        ("import", "restyle or redraw a diagram"),
         ("digest", "import digest"),
         ("icons", "icon catalog"),
         ("library", "brand library"),

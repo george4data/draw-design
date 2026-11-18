@@ -62,6 +62,22 @@ def pick_theme(
     return load_theme(None, adaptive=adaptive, primary=primary)
 
 
+def resolve_theme_for(project: Path | None, profile: str | None = None) -> Theme:
+    """Theme for operations without a spec (import, library): profile > project marker > default."""
+    if profile and profile != "default":
+        p = profile_path(profile)
+        if p is None or not p.is_file():
+            raise DDError(
+                [Finding("THEME-002", f"profile {profile!r} not found", fix="run: ddraw profile list")]
+            )
+        return load_theme(p)
+    if project is not None and profile != "default":
+        res = resolve(project)
+        if res.status in ("profile", "custom-unsaved") and res.path:
+            return load_theme(res.path)
+    return load_theme(None)
+
+
 YES = {"YES", "Y", "TRUE", "OK", "PASS"}
 NO = {"NO", "N", "FALSE", "FAIL"}
 

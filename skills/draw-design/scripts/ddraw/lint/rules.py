@@ -140,6 +140,9 @@ def s003(page: DrawPage, ctx: Context) -> list[Finding]:
 def s004(page: DrawPage, ctx: Context) -> list[Finding]:
     out = []
     for c in page.cells.values():
+        parent = page.cells.get(c.parent)
+        if c.vertex and (c.relative or (parent is not None and parent.edge)):
+            continue  # edge labels: relative geometry, size comes from the text
         if c.vertex:
             g = c.geom
             if not g or any(math.isnan(g.get(k, 0.0)) or math.isinf(g.get(k, 0.0)) for k in g):

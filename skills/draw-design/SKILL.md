@@ -89,7 +89,8 @@ Edge `kind`: `default` (internal call), `accent` (the headline path), `link` (HT
 | "check / lint this diagram" (any .drawio, including hand-made ones) | `ddraw lint <file>.drawio [--json]` and explain the findings | [lint.md](references/lint.md) |
 | "check my setup", "why doesn't export work" | `ddraw doctor` | [doctor.md](references/doctor.md) |
 | "use our brand colours", "make a profile for client X", "switch to the acme theme" | `ddraw profile new/use/list/show` with the user's colours; check contrast | [profiles.md](references/profiles.md) |
-| "onboard from our website", restyle or redraw an existing draw.io/Mermaid file | Not available in this version. Say it is planned; offer a profile from colours the user provides, or a fresh diagram from a spec | — |
+| "restyle / clean up this .drawio", "apply our theme to these diagrams" | `ddraw import <file> [--snap] [--focal ids]`, then `ddraw lint` the result | [import-drawio.md](references/import-drawio.md) |
+| "onboard from our website", redraw a draw.io/Mermaid/PlantUML file as a new diagram | Not available in this version. Say it is planned; offer a profile from colours the user provides, a restyle, or a fresh diagram from a spec | — |
 
 ## 7. Untrusted content
 
